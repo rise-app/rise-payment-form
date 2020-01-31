@@ -1,0 +1,44 @@
+version: 2.1
+
+orbs:
+  cypress: cypress-io/cypress@1.10.0
+
+workflows:
+  build_test_deploy:
+    jobs:
+      - cypress/run:
+          build: 'npm run build'
+          start: 'sirv public'
+          post-steps:
+            - store_test_results:
+                path: cypress/results
+
+jobs:
+  build:
+    working_directory: ~/rise
+    docker:
+      - image: circleci/node:12-browsers
+        environment:
+          CHROME_BIN: '/usr/bin/google-chrome'
+          TZ: 'America/Los_Angeles'
+    environment:
+      TZ: 'America/Los_Angeles'
+    steps:
+      - checkout
+      - run:
+          name: update npm
+          command: 'sudo npm install -g npm@6'
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run:
+          name: npm install
+          command: npm install
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - ./node_modules
+      - run:
+          name: unit tests
+          command: npm run test
+      - store_test_results:
+          path: test-results
