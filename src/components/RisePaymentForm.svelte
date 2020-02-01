@@ -8,7 +8,11 @@
   import ApplePay from './ApplePay.svelte'
 
   // IMPORTS
-  export let type = 'card';
+  export let
+    type = 'card',
+    card = {},
+    check = {},
+    apple = {}
 
   // LOGIC
   const options = [
@@ -26,7 +30,7 @@
 </style>
 
 {#if selected}
-  <svelte:component this={selected.component}></svelte:component>
+  <svelte:component this={selected.component} {...card} ></svelte:component>
 {:else}
   Missing Payment Type
 {/if}

@@ -9,7 +9,7 @@
 
   // IMPORTS
   export let
-    isProcessing = false,
+    is_processing = false,
     gateway_type = 'rise',
     card_type,
 
@@ -33,7 +33,7 @@
 
     // Input Errors
     errors = null,
-    submitText = 'Submit',
+    submit_text = 'Submit',
     disabled_fields = []
 
   // LOGIC
@@ -112,8 +112,8 @@
 
   // DOM controlling variables
   let currentCardBackground = Math.floor(Math.random()* 25 + 1)
-  let min_card_month
-  let min_card_year = new Date().getFullYear()
+  let minCardMonth
+  let minCardYear = new Date().getFullYear()
   let amexCardMask = '#### ###### #####'
   let otherCardMask = '#### #### #### ####'
   let isCardFlipped = false
@@ -121,7 +121,7 @@
   let isInputFocused = false
   let refs = {}
   let cardNumberMask
-  let submitTextOrg = (' ' + submitText).slice(1)
+  let submitTextOrg = (' ' + submit_text).slice(1)
 
   // Visibility Variables
   let
@@ -165,21 +165,19 @@
   })
 
   // Disable the submit button if not valid, and is processing
-  $: disabled = ($cardForm.dirty && !$cardForm.valid) || isProcessing || btnDisabled
-  $: canEditNumber = !isProcessing || disabled_fields.includes('card_number')
-  $: canEditName = !isProcessing || disabled_fields.includes('card_name')
-  $: canEditMonth = !isProcessing || disabled_fields.includes('card_month')
-  $: canEditYear = !isProcessing || disabled_fields.includes('card_year')
-  $: canEditCvv = !isProcessing || disabled_fields.includes('card_cvv')
+  $: disabled = ($cardForm.dirty && !$cardForm.valid) || is_processing || btnDisabled
+  $: canEditNumber = !is_processing || disabled_fields.includes('card_number')
+  $: canEditName = !is_processing || disabled_fields.includes('card_name')
+  $: canEditMonth = !is_processing || disabled_fields.includes('card_month')
+  $: canEditYear = !is_processing || disabled_fields.includes('card_year')
+  $: canEditCvv = !is_processing || disabled_fields.includes('card_cvv')
 
-  $: card_month = card_month < min_card_month
+  $: card_month = card_month < minCardMonth
       ? ''
       : card_month
-  $: min_card_month = card_year === min_card_year
+  $: minCardMonth = card_year === minCardYear
       ? new Date().getMonth() + 1
       : 1
-
-  $: console.log($cardForm)
 
   $: {
     if (card_number.match(new RegExp("^(34|37)")) != null) {
@@ -242,12 +240,12 @@
   }
 
   function processing() {
-    isProcessing = true
-    submitText = 'Processing...'
+    is_processing = true
+    submit_text = 'Processing...'
   }
   function notProcessing() {
-    isProcessing = false
-    submitText = submitTextOrg
+    is_processing = false
+    submit_text = submitTextOrg
   }
 
   async function submit(event) {
@@ -260,12 +258,12 @@
 
   function failed(event) {
     notProcessing()
-    submitText = 'Retry'
+    submit_text = 'Retry'
   }
 
   function complete(event) {
     notProcessing()
-    submitText = 'Submitted!'
+    submit_text = 'Submitted!'
     btnDisabled = true
     dispatch('complete', event)
   }
@@ -1176,7 +1174,7 @@
             >
               <option value="" disabled selected>Month</option>
               {#each Array(12) as _, n}
-                <option value={(n+1) < 10 ? '0' + (n+1) : (n+1)} disabled={(n+1) < min_card_month}>
+                <option value={(n+1) < 10 ? '0' + (n+1) : (n+1)} disabled={(n+1) < minCardMonth}>
                   {(n+1) < 10 ? '0' + (n+1) : (n+1)}
                 </option>
               {/each}
@@ -1193,8 +1191,8 @@
             >
               <option value="" disabled selected>Year</option>
               {#each Array(12) as _, n}
-                <option value={n + min_card_year}>
-                  {n + min_card_year}
+                <option value={n + minCardYear}>
+                  {n + minCardYear}
                 </option>
               {/each}
             </select>
@@ -1259,7 +1257,7 @@
 
       <div
         class="card-form__button"
-        class:active={isProcessing}
+        class:active={is_processing}
         data-progress-style="fill-back"
       >
         <div class="progress"></div>
@@ -1267,10 +1265,10 @@
           class="btn"
           type="submit"
           class:disabled
-          class:isProcessing
+          class:is_processing
           {disabled}
         >
-          {#if isProcessing}
+          {#if is_processing}
             <div
               class="btn__text"
               in:fly={{x:-200}}
@@ -1281,7 +1279,7 @@
               class="btn__text"
               in:fly={{x:-200}}
               out:fly={{x:200}}
-            >{submitText}</div>
+            >{submit_text}</div>
           {/if}
         </button>
       </div>

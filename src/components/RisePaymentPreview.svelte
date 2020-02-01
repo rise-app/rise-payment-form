@@ -1,20 +1,23 @@
 <script>
   // MODULES
 
-
   // COMPONENTS
-  import CreditCard from './CreditCard.svelte'
-  import Check from './Check.svelte'
-  import ApplePay from './ApplePay.svelte'
+  import CreditCardPreview from './CreditCardPreview.svelte'
+  // import Check from './Check.svelte'
+  // import ApplePay from './ApplePay.svelte'
 
   // IMPORTS
-  export let type = 'card';
+  export let
+    type = 'card',
+    card = {},
+    check = {},
+    apple = {}
 
   // LOGIC
   const options = [
-    {name: 'card', component: CreditCard},
-    {name: 'check', component: Check},
-    {name: 'apple', component: ApplePay}
+    {name: 'card', component: CreditCardPreview},
+    // {name: 'check', component: Check},
+    // {name: 'apple', component: ApplePay}
   ]
 
   let selected = options.find(o => o.name === type)
@@ -26,8 +29,7 @@
 </style>
 
 {#if selected}
-<!--  <svelte:component this={selected.component}></svelte:component>-->
-  Not Yet Implemented
+  <svelte:component this={selected.component} {...card} ></svelte:component>
 {:else}
   Missing Payment Type
 {/if}
