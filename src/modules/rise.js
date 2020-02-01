@@ -1,1 +1,3 @@
-export const rise = {}
+export const rise = {
+  ERROR_MESSAGES: {}
+}

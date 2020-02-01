@@ -1,1 +1,3 @@
-export const stripe = {}
+export const stripe = {
+  ERROR_MESSAGES: {}
+}

@@ -1,1 +1,3 @@
-export const nexio = {}
+export const nexio = {
+  ERROR_MESSAGES: {}
+}

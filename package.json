@@ -1,19 +1,19 @@
 {
-  "name": "@rise/payment-form",
-  "repository": "https://github.com/rise-app/rise-payment-form",
-  "main": "dist/index.min.js",
-  "module": "dist/index.min.mjs",
-  "scripts": {
-    "build": "rollup -c",
-    "cy:open": "cypress open",
-    "cy:run": "cypress run",
-    "dev": "rollup -c -w",
-    "lint": "eslint --color --ignore-path .gitignore .",
-    "prepublishOnly": "npm run build",
-    "start": "sirv public",
-    "test": "start-server-and-test dev http://localhost:5000 cy:run"
-  },
-  "description": "Web Component for RiSE Payments",
+	"name": "@rise/payment-form",
+	"repository": "https://github.com/rise-app/rise-payment-form",
+	"main": "dist/index.min.js",
+	"module": "dist/index.min.mjs",
+	"scripts": {
+		"build": "rollup -c",
+		"cy:open": "cypress open",
+		"cy:run": "cypress run",
+		"dev": "rollup -c -w",
+		"lint": "eslint --color --ignore-path .gitignore .",
+		"prepublishOnly": "npm run build",
+		"start": "sirv public",
+		"test": "start-server-and-test dev http://localhost:5000 cy:run"
+	},
+	"description": "Web Component for RiSE Payments",
 	"browserslist": [
 		"defaults"
 	],
@@ -44,6 +44,7 @@
 		"sirv-cli": "0.4.5",
 		"start-server-and-test": "1.10.7",
 		"svelte": "3.18.0",
+		"svelte-forms": "^1.2.0",
 		"svelte-preprocess": "3.3.0"
 	},
 	"files": [

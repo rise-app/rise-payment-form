@@ -1,1 +1,3 @@
-export const apple = {}
+export const apple = {
+  ERROR_MESSAGES: {}
+}
