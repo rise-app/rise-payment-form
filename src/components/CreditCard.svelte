@@ -1,14 +1,15 @@
 <script>
   // MODULES
-  import { form, bindClass } from 'svelte-forms'
   import { onMount, createEventDispatcher } from 'svelte'
+  import { form, bindClass } from 'svelte-forms'
   import { fly } from 'svelte/transition'
   import { spring } from 'svelte/motion'
 
-  import { rise, nexio, apple, stripe, rave } from '../modules'
+  import { nexio, apple, stripe, rave } from '../modules'
 
   // IMPORTS
   export let
+    rise = {}, // The standard RISE details eg. channel_uuid, session, token, etc.
     is_processing = false,
     gateway_type = 'rise',
     card_type,
@@ -34,7 +35,10 @@
     // Input Errors
     errors = null,
     submit_text = 'Submit',
-    disabled_fields = []
+    disabled_fields = [],
+
+    // Security
+    ip
 
   // LOGIC
   const dispatch = createEventDispatcher()
@@ -151,7 +155,6 @@
 
   // Available Gateways
   const GATEWAYS = {
-    'rise': rise,
     'nexio': nexio,
     'rave': rave,
     'apple': apple,
@@ -262,7 +265,7 @@
   async function submit(event) {
     processing()
 
-    return selectedGateway.submit({
+    return selectedGateway.submit(rise, {
       is_processing,
       gateway_type,
       card_type,
@@ -284,6 +287,9 @@
       postal_code,
       province_code,
       country_code,
+
+      //
+      ip,
     })
     .then(res => {
       return complete(res)

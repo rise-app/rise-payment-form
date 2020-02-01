@@ -14,7 +14,7 @@ export const nexio = {
     'unknown': ['500', '501', '503'],
   },
 
-  FIELDS: {
+  CARD_FIELDS: {
     'card_number': 'encryptedNumber',
     'card_name': 'cardHolderName',
     'card_month': 'expirationMonth',
@@ -23,11 +23,33 @@ export const nexio = {
     'card_type': 'cardType'
   },
 
+  CUSTOMER_FIELDS: {
+    'name_first': 'firstName',
+    'name_last': 'lastName',
+    'email': 'email',
+    'phone': 'phone',
+    'address_1': 'billToAddressOne',
+    'address_2': 'billToAddressTwo',
+    'city': 'billToCity',
+    'province_code': 'billToState',
+    'country_code': 'billToCountry',
+  },
+
+
   crypt: new JSEncrypt(),
 
   // TODO
-  getToken: async (publicKey) => {
-    return Promise.resolve('') // publicKey
+  getToken: async (rise, _customer) => {
+    return fetch('https://api.nexiopaysandbox.com/pay/v3/token', {
+      method: 'POST',
+      mode: 'no-cors', // no-cors, *cors, same-origin
+      headers: [
+
+      ],
+      body: JSON.stringify({
+        customer: _customer
+      })
+    })
   },
 
   setKey: (key) => {
@@ -39,12 +61,11 @@ export const nexio = {
 
   transformCard: (card) => {
     const newCard = {}
-    const keys = Object.keys(nexio.FIELDS)
+    const keys = Object.keys(nexio.CARD_FIELDS)
 
     keys.forEach((k) => {
-      console.log('brk ', k, nexio.FIELDS[k], get(card, k))
-      // This handles nested fields in dot syntax
-      newCard[nexio.FIELDS[k]] = get(card, k)
+      // This handles nested card_fields in dot syntax
+      newCard[nexio.CARD_FIELDS[k]] = get(card, k)
     })
 
     try {
@@ -54,10 +75,26 @@ export const nexio = {
       return Promise.reject({errors: [{'unable_to_process': err}]})
     }
 
-    console.log('BRK SUBMITTED!', card, newCard)
-
-
     return Promise.resolve(newCard)
+  },
+
+  transformCustomer: (customer) => {
+    const newCustomer = {}
+    const keys = Object.keys(nexio.CUSTOMER_FIELDS)
+
+    keys.forEach((k) => {
+      // This handles nested customer_fields in dot syntax
+      newCustomer[nexio.CUSTOMER_FIELDS[k]] = get(customer, k)
+    })
+
+    try {
+      newCustomer.encryptedNumber = nexio.encrypt(newCustomer.encryptedNumber)
+    }
+    catch(err) {
+      return Promise.reject({errors: [{'unable_to_process': err}]})
+    }
+
+    return Promise.resolve(newCustomer)
   },
 
   // TODO, make sure this is right
@@ -73,6 +110,10 @@ export const nexio = {
       }
     })
 
+    if (newErrors.length === 0) {
+      newErrors.push({'unknown': null})
+    }
+
     return { errors: newErrors }
   },
 
@@ -81,25 +122,43 @@ export const nexio = {
     return nexio.crypt.encrypt(str)
   },
 
-  submit: async (card) => {
-    return nexio.transformCard(card)
-      .then((card) => {
-        // Get a single use token
-        return nexio.getToken(nexio.publicKey)
-          .then(token => {
-            return [card, token]
+  submit: async (rise, card) => {
+    return Promise.resolve()
+      .then(() => {
+        return nexio.transformCard(card)
+          .then((_card) => {
+            return nexio.transformCustomer(card)
+              .then(_customer => {
+                return [_card, _customer]
+              })
+              .catch(err => {
+                return Promise.reject({errors: [{'unable_to_process': err}]})
+              })
           })
           .catch(err => {
             return Promise.reject({errors: [{'unable_to_process': err}]})
           })
       })
-      .then(([card, token]) => {
+      .then(([_card, _customer]) => {
+        // Get a single use token
+        return nexio.getToken(rise, _customer)
+          .then(token => {
+            return [_card, _customer, token]
+          })
+          .catch(err => {
+            return Promise.reject({errors: [{'unable_to_process': err}]})
+          })
+      })
+      .then(([_card, _customer, { token }]) => {
+
+        console.log("BRK TOKEN", token, _customer)
 
         return fetch('https://api.nexiopaysandbox.com/pay/v3/saveCard', {
           method: 'POST',
+          mode: 'no-cors', // no-cors, *cors, same-origin
           body: JSON.stringify({
             token: token,
-            card: card
+            card: _card
           })
         })
       })
