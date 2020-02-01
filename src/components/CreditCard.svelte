@@ -33,7 +33,8 @@
 
     // Input Errors
     errors = null,
-    submitText = 'Submit'
+    submitText = 'Submit',
+    disabled_fields = []
 
   // LOGIC
   const dispatch = createEventDispatcher()
@@ -139,8 +140,13 @@
 
   // From var to Message ENUM
   const ERROR_MESSAGES = {
-    'invalid_number': 'Credit Card number is INVALID',
-    // 'invalid_number': 'Credit Card number is INVALID'
+    'fraud': 'Unable to process at this time, please contact customer service',
+    'invalid_cvc': 'Invalid CVC',
+    'invalid_request': 'Invalid Request, missing fields required',
+    'invalid_currency': 'Invalid Currency, please contact customer service',
+    'avs_failed': 'Verify AVS Failed',
+    'unable_to_process': 'Invalid Gateway, please contact customer service',
+    'unknown': 'Unknown Error Occurred, contact customer service',
   }
 
   // Available Gateways
@@ -160,11 +166,11 @@
 
   // Disable the submit button if not valid, and is processing
   $: disabled = ($cardForm.dirty && !$cardForm.valid) || isProcessing || btnDisabled
-  $: canEditNumber = !isProcessing
-  $: canEditName = !isProcessing
-  $: canEditMonth = !isProcessing
-  $: canEditYear = !isProcessing
-  $: canEditCvv = !isProcessing
+  $: canEditNumber = !isProcessing || disabled_fields.includes('card_number')
+  $: canEditName = !isProcessing || disabled_fields.includes('card_name')
+  $: canEditMonth = !isProcessing || disabled_fields.includes('card_month')
+  $: canEditYear = !isProcessing || disabled_fields.includes('card_year')
+  $: canEditCvv = !isProcessing || disabled_fields.includes('card_cvv')
 
   $: card_month = card_month < min_card_month
       ? ''
