@@ -1,5 +1,12 @@
 <script>
   import { RisePaymentForm, RisePaymentPreview } from './components/components.module.js'
+
+  function token(event) {
+    console.log('HAVE TOKEN', event)
+  }
+  function edit(event) {
+    console.log('EDIT CLICKED!', event)
+  }
 </script>
 
 <style>
@@ -11,6 +18,7 @@
 <RisePaymentForm
   type="card"
   card="{{
+    gateway_type: 'nexio',
     card_type: null,
     card_name: '',
     card_year: '',
@@ -29,6 +37,7 @@
     disabled_fields: [],
     submit_text: 'Send it'
   }}"
+  on:token={token}
 />
 
 <div class="small-preview">
@@ -43,5 +52,6 @@
     can_edit: true,
     editable_fields: ['card_name', 'card_number', 'card_cvv', 'card_month', 'card_year'],
   }}"
+  on:edit={edit}
 />
 </div>

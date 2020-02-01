@@ -29,7 +29,7 @@
 </style>
 
 {#if selected}
-  <svelte:component this={selected.component} {...card} ></svelte:component>
+  <svelte:component this={selected.component} {...card} on:edit ></svelte:component>
 {:else}
   Missing Payment Type
 {/if}

@@ -248,24 +248,63 @@
     submit_text = submitTextOrg
   }
 
+  function transformErrors(errors = []) {
+
+    return errors.map(v => {
+      const key = Object.keys(v)[0]
+      return {
+        error: key,
+        message: v[key] ? v[key] : ERROR_MESSAGES[key]
+      }
+    })
+  }
+
   async function submit(event) {
     processing()
 
-    return setTimeout(() => {
-      complete()
-    }, 3000)
+    return selectedGateway.submit({
+      is_processing,
+      gateway_type,
+      card_type,
+
+      // Required Fields
+      card_name,
+      card_number,
+      card_month,
+      card_year,
+      card_cvv,
+
+      // Optional Fields based on Gateway
+      email,
+      phone,
+      address_1,
+      address_2,
+      address_3,
+      city,
+      postal_code,
+      province_code,
+      country_code,
+    })
+    .then(res => {
+      return complete(res)
+    })
+    .catch(err => {
+      return failed(err)
+    })
   }
 
-  function failed(event) {
+  function failed(err) {
     notProcessing()
     submit_text = 'Retry'
+    errors = transformErrors(err.errors)
+    dispatch('failed', errors)
   }
 
   function complete(event) {
     notProcessing()
     submit_text = 'Submitted!'
     btnDisabled = true
-    dispatch('complete', event)
+    dispatch('token', event)
   }
 
 </script>
@@ -1088,6 +1127,7 @@
             class="card-form__errors__error"
           >
             {err.message ? err.message : err}
+<!--            <pre>{ JSON.stringify(err)}</pre>-->
           </li>
         {/each}
       </ul>
