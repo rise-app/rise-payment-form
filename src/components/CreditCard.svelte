@@ -349,7 +349,11 @@
     }
   }
 
-  .card-form__errors {
+  .card-form-error-container {
+    transition: all 0.4s ease;
+  }
+
+  .card-form-error-container__errors {
     background: var(--white, #fff);
     box-shadow: 0 30px 60px 0 rgba(90, 116, 148, 0.4);
     border-radius: 10px;
@@ -357,6 +361,10 @@
     padding: 35px;
     margin-bottom: 50px;
     margin-top: 0px;
+    position: relative;
+  }
+  .card-form-error-container__errors > .card-form-error-container__errors__error {
+
   }
 
   .card-form__inner {
@@ -1124,20 +1132,24 @@
       </div>
     </div>
     <form class="card-form__inner" on:submit|preventDefault={submit}>
+      <div class="card-form-error-container">
       {#if !!errors}
-      <ul class="card-form__errors">
-        {#each errors as err, i}
-          <li
-            in:fly={{y:-20}}
-            out:fly={{y:20}}
-            class="card-form__errors__error"
-          >
-            {err.message ? err.message : err}
-<!--            <pre>{ JSON.stringify(err)}</pre>-->
-          </li>
-        {/each}
-      </ul>
+        <ul
+          class="card-form-error-container__errors"
+          in:fly={{y:-20}}
+          out:fly={{y:20}}
+        >
+          {#each errors as err, i}
+            <li
+              class="card-form-error-container__errors__error"
+            >
+              {err.message ? err.message : err}
+  <!--            <pre>{ JSON.stringify(err)}</pre>-->
+            </li>
+          {/each}
+        </ul>
       {/if}
+      </div>
       <div
         class="card-input"
         class:invalid={!$cardForm.card_number.valid}

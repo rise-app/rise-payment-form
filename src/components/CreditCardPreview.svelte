@@ -85,6 +85,9 @@
   $: canEditYear = editable_fields.includes('card_year')
   $: canEditCvv = editable_fields.includes('card_cvv')
 
+  function edit(field) {
+    dispatch('edit', field)
+  }
 </script>
 
 
@@ -588,7 +591,7 @@
           </div>
           <label class="card-item__number" bind:this={refs.card_number_last}>
             {#if can_edit && canEditNumber}
-              <div class="card-item__edit"></div>
+              <div class="card-item__edit" on:click={e=> edit('card_number')}></div>
             {/if}
             {#each cardNumberMask as n, index (index)}
               <div class="card-item__numberItem" class:active={n.trim() === ''}>
@@ -617,7 +620,7 @@
           <div class="card-item__content">
             <label class="card-item__info" bind:this={refs.card_name}>
               {#if can_edit && canEditName}
-                <div class="card-item__edit"></div>
+                <div class="card-item__edit" on:click={e=> edit('card_name')}></div>
               {/if}
               <div class="card-item__holder">Card Holder</div>
               {#if card_name && card_name.length}
@@ -642,7 +645,7 @@
               <label class="card-item__dateTitle">Expires</label>
               <label class="card-item__dateItem">
                 {#if can_edit && canEditMonth}
-                  <div class="card-item__edit"></div>
+                  <div class="card-item__edit" on:click={e=> edit('card_month')}></div>
                 {/if}
                 {#each [card_month] as card_month (card_month)}
                   <span
@@ -654,7 +657,7 @@
               /
               <label class="card-item__dateItem">
                 {#if can_edit && canEditYear}
-                  <div class="card-item__edit"></div>
+                  <div class="card-item__edit" on:click={e=> edit('card_year')}></div>
                 {/if}
                 {#each [card_year] as card_year (card_year)}
                   <span in:fly={{y:-6}} out:fly={{y:6}}>{card_year ? String(card_year).slice(2,4) : 'YY'}</span>
@@ -673,7 +676,7 @@
           <div class="card-item__cvvTitle">CVV</div>
           <div class="card-item__cvvBand">
             {#if can_edit && canEditCvv}
-              <div class="card-item__edit"></div>
+              <div class="card-item__edit" on:click={e=> edit('card_cvv')}></div>
             {/if}
             {card_cvv}
           </div>

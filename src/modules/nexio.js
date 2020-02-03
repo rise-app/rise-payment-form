@@ -4,6 +4,7 @@ import JSEncrypt from 'jsencrypt'
 import get from 'lodash.get'
 
 export const nexio = {
+  // Convert NEXIO status codes to RiSE codes
   ERROR_MESSAGES: {
     'fraud': ['431'],
     'invalid_cvc': ['437'],
@@ -14,6 +15,7 @@ export const nexio = {
     'unknown': ['500', '501', '503'],
   },
 
+  // Convert RiSE fields to NEXIO Card Fields
   CARD_FIELDS: {
     'card_number': 'encryptedNumber',
     'card_name': 'cardHolderName',
@@ -23,6 +25,7 @@ export const nexio = {
     'card_type': 'cardType'
   },
 
+  // Convert RiSE fields to NEXIO Customer Fields
   CUSTOMER_FIELDS: {
     'name_first': 'firstName',
     'name_last': 'lastName',
@@ -35,12 +38,22 @@ export const nexio = {
     'country_code': 'billToCountry',
   },
 
+  // If requests should use the sandbox or not
+  LIVE_MODE: false,
 
+  // The URL to save a card
+  saveCardUrl: nexio.LIVE_MODE ? '' : 'https://api.nexiopaysandbox.com/pay/v3/saveCard',
+
+  // The URL to get a the token from
+  getTokenUrl: nexio.LIVE_MODE ? '' : 'https://api.nexiopaysandbox.com/pay/v3/token',
+
+  // The browser encryption library
   crypt: new JSEncrypt(),
 
   // TODO
+  // Get a NEXIO single use token
   getToken: async (rise, _customer) => {
-    return fetch('https://api.nexiopaysandbox.com/pay/v3/token', {
+    return fetch(nexio.getTokenUrl, {
       method: 'POST',
       mode: 'no-cors', // no-cors, *cors, same-origin
       headers: [
@@ -52,13 +65,16 @@ export const nexio = {
     })
   },
 
+  // Set the Public key in which to encrpyt the card number
   setKey: (key) => {
     nexio.publicKey = key
     return nexio.publicKey
   },
 
+  // The public key
   publicKey: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvWpIQFjQQCPpaIlJKpeg irp5kLkzLB1AxHmnLk73D3TJbAGqr1QmlsWDBtMPMRpdzzUM7ZwX3kzhIuATV4Pe 7RKp3nZlVmcrT0YCQXBrTwqZNh775z58GP2kZs+gVfNqBampJPzSB/hB62KkByhE Cn6grrRjiAVwJyZVEvs/2vrxaEpO+aE16emtX12RgI5JdzdOiNyZEQteU6zRBRJE ocPWVxExaOpVVVJ5+UnW0LcalzA+lRGRTrQJ5JguAPiAOzRPTK/lYFFpCAl/F8wt oAVG1c8zO2NcQ0Pko+fmeidRFxJ/did2btV+9Mkze3mBphwFmvnxa35LF+Cs/XJHDwIDAQAB',
 
+  // Transform RiSE fields into a nexio CARD
   transformCard: (card) => {
     const newCard = {}
     const keys = Object.keys(nexio.CARD_FIELDS)
@@ -78,6 +94,7 @@ export const nexio = {
     return Promise.resolve(newCard)
   },
 
+  // Transform RiSE fields into a Nexio Customer
   transformCustomer: (customer) => {
     const newCustomer = {}
     const keys = Object.keys(nexio.CUSTOMER_FIELDS)
@@ -98,6 +115,7 @@ export const nexio = {
   },
 
   // TODO, make sure this is right
+  // Transform Nexio error codes into RiSE error codes
   transformError: ({error, message}) => {
     console.log('BRK errors', error, message)
 
@@ -117,11 +135,13 @@ export const nexio = {
     return { errors: newErrors }
   },
 
+  // Encrpt a string using the public key
   encrypt: (str) => {
     nexio.crypt.setKey(nexio.publicKey)
     return nexio.crypt.encrypt(str)
   },
 
+  // Submit the Card to Nexio and return the result or errors
   submit: async (rise, card) => {
     return Promise.resolve()
       .then(() => {
@@ -153,7 +173,7 @@ export const nexio = {
 
         console.log("BRK TOKEN", token, _customer)
 
-        return fetch('https://api.nexiopaysandbox.com/pay/v3/saveCard', {
+        return fetch(nexio.saveCardUrl, {
           method: 'POST',
           mode: 'no-cors', // no-cors, *cors, same-origin
           body: JSON.stringify({
