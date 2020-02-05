@@ -9,6 +9,7 @@
 
   // IMPORTS
   export let
+    rise = {},
     type = 'card',
     card = {},
     check = {},
@@ -30,7 +31,7 @@
 </style>
 
 {#if selected}
-  <svelte:component this={selected.component} {...card} on:token ></svelte:component>
+  <svelte:component this={selected.component} {rise} {...card} on:token ></svelte:component>
 {:else}
   Missing Payment Type
 {/if}

@@ -36,8 +36,12 @@
     errors = null,
     submit_text = 'Submit',
     disabled_fields = [],
+    card_number_label = 'Card Number',
+    card_name_label = 'Card Holder',
+    card_expiration_label = 'Expiration Date',
+    card_cvv_label = 'CVV',
 
-    // Security
+                  // Security
     ip
 
   // LOGIC
@@ -1073,7 +1077,7 @@
             </label>
             <div class="card-item__content">
               <label for="card_name" class="card-item__info" bind:this={refs.card_name}>
-                <div class="card-item__holder">Card Holder</div>
+                <div class="card-item__holder">{card_name_label}</div>
                 {#if card_name.length}
                   <div class="card-item__name">
                     {#each card_name.replace(/\s\s+/g, ' ') as n, index (index + 1)}
@@ -1118,7 +1122,7 @@
           </div>
           <div class="card-item__band"></div>
           <div class="card-item__cvv">
-            <div class="card-item__cvvTitle">CVV</div>
+            <div class="card-item__cvvTitle">{card_cvv_label}</div>
             <div class="card-item__cvvBand">{card_cvv}</div>
             <div class="card-item__type">
               {#if card_type}
@@ -1155,7 +1159,7 @@
         class:invalid={!$cardForm.card_number.valid}
         use:bindClass="{{ form: cardForm, name: 'card_number', invalid: 'invalid' }}"
       >
-        <label for="card_number" class="card-input__label">Card Number</label>
+        <label for="card_number" class="card-input__label">{card_number_label}</label>
         <input
           type="text"
           id="card_number"
@@ -1187,7 +1191,7 @@
         class:invalid={!$cardForm.card_name.valid}
         use:bindClass="{{ form: cardForm, name: 'card_name', invalid: 'invalid' }}"
       >
-        <label for="card_name" class="card-input__label">Card Holder</label>
+        <label for="card_name" class="card-input__label">{card_name_label}</label>
         <input
           type="text"
           id="card_name"
@@ -1287,7 +1291,7 @@
             class:invalid={!$cardForm.card_cvv.valid}
             use:bindClass="{{ form: cardForm, name: 'card_cvv', invalid: 'invalid' }}"
           >
-            <label for="card_cvv" class="card-input__label">CVV</label>
+            <label for="card_cvv" class="card-input__label">{card_cvv_label}</label>
             <input
               type="text"
               class="card-input__input"

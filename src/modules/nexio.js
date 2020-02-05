@@ -12,7 +12,7 @@ export const nexio = {
     'invalid_currency': ['432'],
     'avs_failed': ['443'],
     'unable_to_process': ['435', '436', '439', '440', '404', '409'],
-    'unknown': ['500', '501', '503'],
+    'unknown': ['500', '501', '503', 'E_NOT_FOUND'],
   },
 
   // Convert RiSE fields to NEXIO Card Fields
@@ -42,10 +42,14 @@ export const nexio = {
   LIVE_MODE: false,
 
   // The URL to save a card
-  saveCardUrl: nexio.LIVE_MODE ? '' : 'https://api.nexiopaysandbox.com/pay/v3/saveCard',
+  saveCardUrl: (rise) => nexio.LIVE_MODE || rise.live_mode
+    ? 'https://api.nexiopaysandbox.com/pay/v3/saveCard'
+    : 'https://api.nexiopay.com/pay/v3/saveCard',
 
   // The URL to get a the token from
-  getTokenUrl: nexio.LIVE_MODE ? '' : 'https://api.nexiopaysandbox.com/pay/v3/token',
+  getTokenUrl: (rise) => nexio.LIVE_MODE || rise.live_mode
+    ? `https://api.rise.store/api/v1/channels/${rise.channel_uuid}/endpoints/name/nexio-one-time-use-token`
+    : `https://api.sandbox.rise.store/api/v1/channels/${rise.channel_uuid}/endpoints/name/nexio-one-time-use-token`,
 
   // The browser encryption library
   crypt: new JSEncrypt(),
@@ -53,16 +57,28 @@ export const nexio = {
   // TODO
   // Get a NEXIO single use token
   getToken: async (rise, _customer) => {
-    return fetch(nexio.getTokenUrl, {
+    return fetch(nexio.getTokenUrl(rise), {
       method: 'POST',
       mode: 'no-cors', // no-cors, *cors, same-origin
-      headers: [
-
-      ],
+      headers: {
+        'X-APPLICATION-KEY': rise.key_public,
+        'Authorization': `JWT ${rise.token}`,
+        'Session': rise.session
+      },
       body: JSON.stringify({
         customer: _customer
       })
     })
+      .then((response) => {
+        return response.json()
+      })
+      .then(res => {
+        console.log('BRK RES', res)
+        if (res.error) {
+          return Promise.reject(res)
+        }
+        return res
+      })
   },
 
   // Set the Public key in which to encrpyt the card number
@@ -135,7 +151,7 @@ export const nexio = {
     return { errors: newErrors }
   },
 
-  // Encrpt a string using the public key
+  // Encrypt a string using the public key
   encrypt: (str) => {
     nexio.crypt.setKey(nexio.publicKey)
     return nexio.crypt.encrypt(str)
@@ -171,9 +187,9 @@ export const nexio = {
       })
       .then(([_card, _customer, { token }]) => {
 
-        console.log("BRK TOKEN", token, _customer)
+        console.log('BRK TOKEN', token, _customer)
 
-        return fetch(nexio.saveCardUrl, {
+        return fetch(nexio.saveCardUrl(rise), {
           method: 'POST',
           mode: 'no-cors', // no-cors, *cors, same-origin
           body: JSON.stringify({
