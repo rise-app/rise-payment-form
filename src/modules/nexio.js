@@ -56,14 +56,27 @@ export const nexio = {
 
   // Get a NEXIO single use token
   getToken: async (rise, _customer) => {
+    const headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    }
+    if (rise.key_public) {
+      headers['X-APPLICATION-KEY'] = rise.key_public
+    }
+    if (rise.session) {
+      headers['Session'] = rise.session
+    }
+    if (rise.token) {
+      headers['Authorization'] = `JWT ${rise.token}`
+    }
+
+    console.log('BRK NEXIO RISE HEADER', headers)
+
     return fetch(nexio.getTokenUrl(rise), {
       method: 'POST',
       mode: 'no-cors', // no-cors, *cors, same-origin
-      headers: {
-        'X-APPLICATION-KEY': rise.key_public,
-        'Authorization': `JWT ${rise.token}`,
-        'Session': rise.session
-      },
+      cache: 'no-cache',
+      headers: headers,
       body: JSON.stringify({
         customer: _customer
       })
@@ -86,7 +99,7 @@ export const nexio = {
     return nexio.publicKey
   },
 
-  // The public key
+  // The NEXIO public key
   publicKey: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvWpIQFjQQCPpaIlJKpeg irp5kLkzLB1AxHmnLk73D3TJbAGqr1QmlsWDBtMPMRpdzzUM7ZwX3kzhIuATV4Pe 7RKp3nZlVmcrT0YCQXBrTwqZNh775z58GP2kZs+gVfNqBampJPzSB/hB62KkByhE Cn6grrRjiAVwJyZVEvs/2vrxaEpO+aE16emtX12RgI5JdzdOiNyZEQteU6zRBRJE ocPWVxExaOpVVVJ5+UnW0LcalzA+lRGRTrQJ5JguAPiAOzRPTK/lYFFpCAl/F8wt oAVG1c8zO2NcQ0Pko+fmeidRFxJ/did2btV+9Mkze3mBphwFmvnxa35LF+Cs/XJHDwIDAQAB',
 
   // Transform RiSE fields into a nexio CARD
@@ -157,7 +170,8 @@ export const nexio = {
   },
 
   // Submit the Card to Nexio and return the result or errors
-  submit: async (rise, card) => {
+  submit: async (rise, config, card) => {
+    nexio.setKey(config.pubKey)
     return Promise.resolve()
       .then(() => {
         return nexio.transformCard(card)

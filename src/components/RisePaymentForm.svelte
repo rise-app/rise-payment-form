@@ -10,6 +10,9 @@
   // IMPORTS
   export let
     rise = {},
+    nexio = {},
+    stripe = {},
+    rave = {},
     type = 'card',
     card = {},
     check = {},
@@ -27,6 +30,7 @@
   let cardValues = {
     card_name: card.card_name || '',
     card_number: card.card_number || '',
+    card_number_last: card.card_number_last || '',
     card_year: card.card_year || '',
     card_month: card.card_month || '',
     card_cvv: card.card_cvv || '',
@@ -72,7 +76,17 @@
 </style>
 
 {#if selected}
-  <svelte:component this={selected.component} {rise} card={cardValues} {...formValues} on:token ></svelte:component>
+  <svelte:component
+    this={selected.component}
+    {rise}
+    {nexio}
+    {apple}
+    {stripe}
+    {rave}
+    card={cardValues}
+    {...formValues}
+    on:token
+  ></svelte:component>
 {:else}
   Missing Payment Type: {type}
 {/if}

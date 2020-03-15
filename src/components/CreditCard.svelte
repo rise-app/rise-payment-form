@@ -5,11 +5,23 @@
   import { fly } from 'svelte/transition'
   import { spring } from 'svelte/motion'
 
-  import { rise as riseGateway, nexio, apple, stripe, rave } from '../modules'
+  import {
+    rise as riseGateway,
+    nexio as nexioGateway,
+    apple as appleGateway,
+    stripe as stripeGateway,
+    rave as raveGateway
+  } from '../modules'
 
   // IMPORTS
   export let
     rise = {}, // The standard RISE details eg. channel_uuid, session, token, etc.
+
+    nexio = {},
+    stripe = {},
+    rave = {},
+    apple = {},
+
     is_processing = false,
     gateway_type = 'rise',
     card_type,
@@ -165,14 +177,22 @@
   // Available Gateways
   const GATEWAYS = {
     'rise': riseGateway,
+    'nexio': nexioGateway,
+    'rave': raveGateway,
+    'apple': appleGateway,
+    'stripe': stripeGateway
+  }
+
+  const GATEWAY_CONFIGS = {
+    'rise': rise,
     'nexio': nexio,
     'rave': rave,
     'apple': apple,
-    'strip': stripe
+    'stripe': stripe
   }
 
   let selectedGateway = GATEWAYS[gateway_type]
-  console.log('BRK selected', selectedGateway, gateway_type)
+  let selectedGatewayConfig = GATEWAY_CONFIGS[gateway_type]
 
   onMount(function() {
     document.getElementById('card_number').focus()
@@ -284,7 +304,7 @@
   async function submit(event) {
     processing()
 
-    return selectedGateway.submit(rise, {
+    return selectedGateway.submit(rise, selectedGatewayConfig, {
       is_processing,
       gateway_type,
       card_type,

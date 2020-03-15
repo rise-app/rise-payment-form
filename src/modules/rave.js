@@ -44,7 +44,7 @@ export const rave = {
 
 
   // Submit the Card to Rave and return the result or errors
-  submit: async (rise, card) => {
+  submit: async (rise, config, card) => {
 
   }
 }

@@ -91,7 +91,7 @@ export const stripe = {
     return { errors: newErrors }
   },
 
-  submit: async (rise, card) => {
+  submit: async (rise, config, card) => {
     return Promise.resolve()
       .then(() => {
         return stripe.transformCard(card)

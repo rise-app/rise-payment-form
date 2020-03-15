@@ -1,11 +1,14 @@
 <script>
   import { RisePaymentForm, RisePaymentPreview } from './components/components.module.js'
 
+  let demoToken, demoEdit
   function token(event) {
     console.log('HAVE TOKEN', event)
+    demoToken = event
   }
   function edit(event) {
     console.log('EDIT CLICKED!', event)
+    demoEdit = event
   }
 </script>
 
@@ -17,7 +20,15 @@
 
 <RisePaymentForm
   type="card"
-  rise="{{}}"
+  rise="{{
+    channel_uuid: '00000000-0000-0000-0000-000000000000',
+    key_public: 'pk_00000000-0000-0000-0000-000000000000',
+    live_mode: false
+  }}"
+  nexio="{{
+    live_mode: false,
+    publicKey: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvWpIQFjQQCPpaIlJKpeg irp5kLkzLB1AxHmnLk73D3TJbAGqr1QmlsWDBtMPMRpdzzUM7ZwX3kzhIuATV4Pe 7RKp3nZlVmcrT0YCQXBrTwqZNh775z58GP2kZs+gVfNqBampJPzSB/hB62KkByhE Cn6grrRjiAVwJyZVEvs/2vrxaEpO+aE16emtX12RgI5JdzdOiNyZEQteU6zRBRJE ocPWVxExaOpVVVJ5+UnW0LcalzA+lRGRTrQJ5JguAPiAOzRPTK/lYFFpCAl/F8wt oAVG1c8zO2NcQ0Pko+fmeidRFxJ/did2btV+9Mkze3mBphwFmvnxa35LF+Cs/XJHDwIDAQAB'
+  }}"
   card="{{
     gateway_type: 'nexio',
     card_type: null,
@@ -40,11 +51,27 @@
   }}"
   on:token={token}
 />
+<div>
+  <fieldset>
+    <legend>
+     on:token Event
+    </legend>
+    {demoToken}
+  </fieldset>
+</div>
 
 <div class="small-preview">
 <RisePaymentPreview
   type="card"
-  rise="{{}}"
+  rise="{{
+    channel_uuid: '00000000-0000-0000-0000-000000000000',
+    key_public: 'pk_00000000-0000-0000-0000-000000000000',
+    live_mode: false
+  }}"
+  nexio="{{
+    live_mode: false,
+    publicKey: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvWpIQFjQQCPpaIlJKpeg irp5kLkzLB1AxHmnLk73D3TJbAGqr1QmlsWDBtMPMRpdzzUM7ZwX3kzhIuATV4Pe 7RKp3nZlVmcrT0YCQXBrTwqZNh775z58GP2kZs+gVfNqBampJPzSB/hB62KkByhE Cn6grrRjiAVwJyZVEvs/2vrxaEpO+aE16emtX12RgI5JdzdOiNyZEQteU6zRBRJE ocPWVxExaOpVVVJ5+UnW0LcalzA+lRGRTrQJ5JguAPiAOzRPTK/lYFFpCAl/F8wt oAVG1c8zO2NcQ0Pko+fmeidRFxJ/did2btV+9Mkze3mBphwFmvnxa35LF+Cs/XJHDwIDAQAB'
+  }}"
   card="{{
     card_type: 'visa',
     card_number_last: '4242',
@@ -56,4 +83,10 @@
   }}"
   on:edit={edit}
 />
+</div>
+<div>
+  <fieldset>
+    <legend>on:edit Event</legend>
+    {demoEdit}
+  </fieldset>
 </div>
