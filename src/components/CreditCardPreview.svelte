@@ -4,31 +4,35 @@
   import { fly } from 'svelte/transition'
   import { spring } from 'svelte/motion'
 
-  import { rise, nexio, apple, stripe, rave } from '../modules'
+  import { rise as riseGateway, nexio, apple, stripe, rave } from '../modules'
 
   // IMPORTS
   export let
-    isProcessing = false,
+    rise = {},
+    is_processing = false,
     gateway_type = 'rise',
     card_type = 'rise',
 
-    // Required Fields
-    card_name = '',
-    card_number_last = '',
-    card_month = '',
-    card_year = '',
-    card_cvv = '',
+    // The card Object
+    card = {
+      // Required Fields
+      card_name: '',
+      card_number_last: '',
+      card_month: '',
+      card_year: '',
+      card_cvv: '',
 
-    // Optional Fields based on Gateway
-    email = null,
-    phone = null,
-    address_1 = null,
-    address_2 = null,
-    address_3 = null,
-    city = null,
-    postal_code = null,
-    province_code = null,
-    country_code = null,
+      // Optional Fields based on Gateway
+      email: null,
+      phone: null,
+      address_1: null,
+      address_2: null,
+      address_3: null,
+      city: null,
+      postal_code: null,
+      province_code: null,
+      country_code: null,
+    },
 
     // Input Errors
     errors = null,
@@ -42,8 +46,8 @@
 
   // DOM controlling variables
   // Choose the background image off the last character so they aren't random each time
-  let currentCardBackground = card_number_last
-      ? parseInt(card_number_last.charAt(card_number_last.length-1))
+  let currentCardBackground = card.card_number_last
+      ? parseInt(card.card_number_last.charAt(card.card_number_last.length-1))
       : Math.floor(Math.random()* 25 + 1)
   let minCardMonth
   let minCardYear = new Date().getFullYear()
@@ -59,7 +63,7 @@
 
   // Available Gateways
   const GATEWAYS = {
-    'rise': rise,
+    'rise': riseGateway,
     'nexio': nexio,
     'rave': rave,
     'apple': apple,
@@ -603,11 +607,11 @@
             {/each}
             {#each cardNumberLastMask as n, index (index)}
               <div class="card-item__numberItem" class:active={n.trim() === ''}>
-                {#if card_number_last && card_number_last.length > index}
+                {#if card.card_number_last && card.card_number_last.length > index}
                   <span
                     in:fly={{y:-10}}
                     out:fly={{y:10}}
-                  >{card_number_last[index]}</span>
+                  >{card.card_number_last[index]}</span>
                 {:else}
                   <span
                     in:fly={{y:-10}}
@@ -623,9 +627,9 @@
                 <div class="card-item__edit" on:click={e=> edit('card_name')}></div>
               {/if}
               <div class="card-item__holder">Card Holder</div>
-              {#if card_name && card_name.length}
+              {#if card.card_name && card.card_name.length}
                 <div class="card-item__name">
-                  {#each card_name.replace(/\s\s+/g, ' ') as n, index (index + 1)}
+                  {#each card.card_name.replace(/\s\s+/g, ' ') as n, index (index + 1)}
                     {#if index == index}
                       <span
                         in:fly={{y:-6}}
@@ -647,7 +651,7 @@
                 {#if can_edit && canEditMonth}
                   <div class="card-item__edit" on:click={e=> edit('card_month')}></div>
                 {/if}
-                {#each [card_month] as card_month (card_month)}
+                {#each [card.card_month] as card_month (card_month)}
                   <span
                     in:fly={{y:-6}}
                     out:fly={{y:6}}
@@ -659,7 +663,7 @@
                 {#if can_edit && canEditYear}
                   <div class="card-item__edit" on:click={e=> edit('card_year')}></div>
                 {/if}
-                {#each [card_year] as card_year (card_year)}
+                {#each [card.card_year] as card_year (card_year)}
                   <span in:fly={{y:-6}} out:fly={{y:6}}>{card_year ? String(card_year).slice(2,4) : 'YY'}</span>
                 {/each}
               </label>
@@ -678,7 +682,7 @@
             {#if can_edit && canEditCvv}
               <div class="card-item__edit" on:click={e=> edit('card_cvv')}></div>
             {/if}
-            {card_cvv}
+            {card.card_cvv}
           </div>
           <div class="card-item__type">
             {#if card_type}

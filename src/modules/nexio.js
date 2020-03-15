@@ -48,13 +48,12 @@ export const nexio = {
 
   // The URL to get a the token from
   getTokenUrl: (rise) => nexio.LIVE_MODE || rise.live_mode
-    ? `https://api.rise.store/api/v1/channels/${rise.channel_uuid}/endpoints/name/nexio-one-time-use-token`
-    : `https://api.sandbox.rise.store/api/v1/channels/${rise.channel_uuid}/endpoints/name/nexio-one-time-use-token`,
+    ? `https://api.rise.store/api/v1/channels/${rise.channel_uuid}/endpoints/handle/nexio-one-time-use-token`
+    : `https://api.sandbox.rise.store/api/v1/channels/${rise.channel_uuid}/endpoints/handle/nexio-one-time-use-token`,
 
   // The browser encryption library
   crypt: new JSEncrypt(),
 
-  // TODO
   // Get a NEXIO single use token
   getToken: async (rise, _customer) => {
     return fetch(nexio.getTokenUrl(rise), {

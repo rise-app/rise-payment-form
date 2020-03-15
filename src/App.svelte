@@ -17,6 +17,7 @@
 
 <RisePaymentForm
   type="card"
+  rise="{{}}"
   card="{{
     gateway_type: 'nexio',
     card_type: null,
@@ -26,7 +27,7 @@
     email: null,
     phone: null,
     address_1: null,
-    address_1: null,
+    address_2: null,
     address_3: null,
     city: null,
     postal_code: null,
@@ -43,6 +44,7 @@
 <div class="small-preview">
 <RisePaymentPreview
   type="card"
+  rise="{{}}"
   card="{{
     card_type: 'visa',
     card_number_last: '4242',

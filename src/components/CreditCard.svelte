@@ -5,7 +5,7 @@
   import { fly } from 'svelte/transition'
   import { spring } from 'svelte/motion'
 
-  import { nexio, apple, stripe, rave } from '../modules'
+  import { rise as riseGateway, nexio, apple, stripe, rave } from '../modules'
 
   // IMPORTS
   export let
@@ -14,23 +14,27 @@
     gateway_type = 'rise',
     card_type,
 
-    // Required Fields
-    card_name = '',
-    card_number = '',
-    card_month = '',
-    card_year = '',
-    card_cvv = '',
+    // The card Object
+    card = {
+      // Required Fields
+      card_name: '',
+      card_number: '',
+      card_month: '',
+      card_year: '',
+      card_cvv: '',
+      card_currency: '',
 
-    // Optional Fields based on Gateway
-    email = null,
-    phone = null,
-    address_1 = null,
-    address_2 = null,
-    address_3 = null,
-    city = null,
-    postal_code = null,
-    province_code = null,
-    country_code = null,
+      // Optional Fields based on Gateway
+      email: null,
+      phone: null,
+      address_1: null,
+      address_2: null,
+      address_3: null,
+      city: null,
+      postal_code: null,
+      province_code: null,
+      country_code: null,
+    },
 
     // Input Errors
     errors = null,
@@ -41,7 +45,7 @@
     card_expiration_label = 'Expiration Date',
     card_cvv_label = 'CVV',
 
-                  // Security
+    // Security
     ip
 
   // LOGIC
@@ -52,64 +56,64 @@
    */
   const cardForm = form(() => ({
     card_number: {
-      value: card_number,
+      value: card.card_number,
       validators: ['required', 'min:16', 'max:17'],
       // enabled: false
     },
     card_name: {
-      value: card_name,
+      value: card.card_name,
       validators: ['required', 'min:3'],
       // enabled: true
     },
     card_month: {
-      value: card_month,
+      value: card.card_month,
       validators: ['required', 'equal:2'],
       // enabled: true
     },
     card_year: {
-      value: card_year,
+      value: card.card_year,
       validators: ['required', 'equal:4'],
       // enabled: true
     },
     card_cvv: {
-      value: card_cvv,
+      value: card.card_cvv,
       validators: ['required', 'between:3:4'],
       // enabled: true
     },
     email: {
-      value: email,
+      value: card.email,
       validators: []
     },
     phone: {
-      value: phone,
+      value: card.phone,
       validators: []
     },
     address_1: {
-      value: address_1,
+      value: card.address_1,
       validators: []
     },
     address_2: {
-      value: address_2,
+      value: card.address_2,
       validators: []
     },
     address_3: {
-      value: address_3,
+      value: card.address_3,
       validators: []
     },
     city: {
-      value: city,
+      value: card.city,
       validators: []
     },
     postal_code: {
-      value: postal_code,
+      value: card.postal_code,
       validators: []
     },
     province_code: {
-      value: province_code,
+      value: card.province_code,
       validators: []
     },
     country_code: {
-      value: country_code,
+      value: card.country_code,
       validators: []
     }
   }),
@@ -144,7 +148,8 @@
     showCountry = false,
     showProvince = false,
     showEmail = false,
-    showPhone = false
+    showPhone = false,
+    cardYear
 
   // From var to Message ENUM
   const ERROR_MESSAGES = {
@@ -159,6 +164,7 @@
 
   // Available Gateways
   const GATEWAYS = {
+    'rise': riseGateway,
     'nexio': nexio,
     'rave': rave,
     'apple': apple,
@@ -166,6 +172,7 @@
   }
 
   let selectedGateway = GATEWAYS[gateway_type]
+  console.log('BRK selected', selectedGateway, gateway_type)
 
   onMount(function() {
     document.getElementById('card_number').focus()
@@ -179,24 +186,19 @@
   $: canEditYear = !is_processing || disabled_fields.includes('card_year')
   $: canEditCvv = !is_processing || disabled_fields.includes('card_cvv')
 
-  $: card_month = card_month < minCardMonth
-      ? ''
-      : card_month
-  $: minCardMonth = card_year === minCardYear
-      ? new Date().getMonth() + 1
-      : 1
-
   $: {
-    if (card_number.match(new RegExp("^(34|37)")) != null) {
+
+    // Set the card_type
+    if (card.card_number.match(new RegExp("^(34|37)")) != null) {
       card_type = "amex"
     }
-    else if (card_number.match(new RegExp("^5[1-5]")) != null) {
+    else if (card.card_number.match(new RegExp("^5[1-5]")) != null) {
       card_type = "mastercard"
     }
-    else if (card_number.match(new RegExp("^6011")) != null) {
+    else if (card.card_number.match(new RegExp("^6011")) != null) {
       card_type = "discover"
     }
-    else if (card_number.match(new RegExp("^4")) != null) {
+    else if (card.card_number.match(new RegExp("^4")) != null) {
       card_type = "visa"
     }
     // default type
@@ -204,21 +206,30 @@
       card_type = "rise"
     }
 
+    // Set the min card month as the current month of the currnet year
+    minCardMonth = card.card_year === minCardYear
+      ? new Date().getMonth() + 1
+      : 1
     // Set mask type
     cardNumberMask = card_type === "amex"
       ? amexCardMask
       : otherCardMask
 
     // Credit card input masking
-    for (let index = 0; index < card_number.length; index++) {
-      if (cardNumberMask[index] == ' ' && card_number[index] !== ' ') {
-        card_number = card_number.substr(0, index) + ' ' + card_number.substr(index, card_number.length-index)
+    for (let index = 0; index < card.card_number.length; index++) {
+      if (cardNumberMask[index] == ' ' && card.card_number[index] !== ' ') {
+        card.card_number = card.card_number.substr(0, index) + ' ' + card.card_number.substr(index, card.card_number.length-index)
       }
     }
-    if (card_number.substr('-1') == ' ') {
-      card_number = card_number.substr(0, card_number.length-1)
+    if (card.card_number.substr('-1') == ' ') {
+      card.card_number = card.card_number.substr(0, card.card_number.length-1)
     }
-    card_number = card_number.substr(0, cardNumberMask.length).replace(/[^0-9 ]/g, '')
+    card.card_number = card.card_number.substr(0, cardNumberMask.length).replace(/[^0-9 ]/g, '')
+
+    // Set the card month on change if it is less than the current month of the current year
+    if (card.card_month < minCardMonth ) {
+      card.card_month = ''
+    }
   }
 
   /**
@@ -266,6 +277,10 @@
     })
   }
 
+  /**
+   * Submit the Card to the Selected Gateway
+   * @param event
+   */
   async function submit(event) {
     processing()
 
@@ -274,23 +289,25 @@
       gateway_type,
       card_type,
 
-      // Required Fields
-      card_name,
-      card_number,
-      card_month,
-      card_year,
-      card_cvv,
-
-      // Optional Fields based on Gateway
-      email,
-      phone,
-      address_1,
-      address_2,
-      address_3,
-      city,
-      postal_code,
-      province_code,
-      country_code,
+      ...card,
+      //
+      // // Required Fields
+      // card_name,
+      // card_number,
+      // card_month,
+      // card_year,
+      // card_cvv,
+      //
+      // // Optional Fields based on Gateway
+      // email,
+      // phone,
+      // address_1,
+      // address_2,
+      // address_3,
+      // city,
+      // postal_code,
+      // province_code,
+      // country_code,
 
       //
       ip,
@@ -1061,11 +1078,11 @@
             <label for="card_number" class="card-item__number" bind:this={refs.card_number}>
               {#each cardNumberMask as n, index (index)}
                 <div class="card-item__numberItem" class:active={n.trim() === ''}>
-                  {#if card_number && card_number.length > index}
+                  {#if card.card_number && card.card_number.length > index}
                     <span
                       in:fly={{y:-10}}
                       out:fly={{y:10}}
-                    >{card_number[index]}</span>
+                    >{card.card_number[index]}</span>
                   {:else}
                     <span
                       in:fly={{y:-10}}
@@ -1078,9 +1095,9 @@
             <div class="card-item__content">
               <label for="card_name" class="card-item__info" bind:this={refs.card_name}>
                 <div class="card-item__holder">{card_name_label}</div>
-                {#if card_name.length}
+                {#if card.card_name.length}
                   <div class="card-item__name">
-                    {#each card_name.replace(/\s\s+/g, ' ') as n, index (index + 1)}
+                    {#each card.card_name.replace(/\s\s+/g, ' ') as n, index (index + 1)}
                       {#if index == index}
                         <span
                           in:fly={{y:-6}}
@@ -1099,7 +1116,7 @@
               <div class="card-item__date" bind:this={refs.cardDate}>
                 <label for="card_month" class="card-item__dateTitle">Expires</label>
                 <label for="card_month" class="card-item__dateItem">
-                  {#each [card_month] as card_month (card_month)}
+                  {#each [card.card_month] as card_month (card_month)}
                     <span
                       in:fly={{y:-6}}
                       out:fly={{y:6}}
@@ -1108,7 +1125,7 @@
                 </label>
                 /
                 <label for="card_year" class="card-item__dateItem">
-                  {#each [card_year] as card_year (card_year)}
+                  {#each [card.card_year] as card_year (card_year)}
                     <span in:fly={{y:-6}} out:fly={{y:6}}>{card_year ? String(card_year).slice(2,4) : 'YY'}</span>
                   {/each}
                 </label>
@@ -1123,7 +1140,7 @@
           <div class="card-item__band"></div>
           <div class="card-item__cvv">
             <div class="card-item__cvvTitle">{card_cvv_label}</div>
-            <div class="card-item__cvvBand">{card_cvv}</div>
+            <div class="card-item__cvvBand">{card.card_cvv}</div>
             <div class="card-item__type">
               {#if card_type}
                 {#each [card_type] as card_type (card_type)}
@@ -1165,7 +1182,7 @@
           id="card_number"
           class="card-input__input"
           v-mask="generateCardNumberMask"
-          bind:value={card_number}
+          bind:value={card.card_number}
           on:focus={focusInput}
           on:blur={blurInput}
           data-ref="card_number"
@@ -1196,7 +1213,7 @@
           type="text"
           id="card_name"
           class="card-input__input"
-          bind:value={card_name}
+          bind:value={card.card_name}
           on:focus={focusInput}
           on:blur={blurInput}
           data-ref="card_name"
@@ -1228,7 +1245,7 @@
             <select
               class="card-input__input select"
               id="card_month"
-              bind:value={card_month}
+              bind:value={card.card_month}
               on:focus={focusInput}
               on:blur={blurInput}
               data-ref="cardDate"
@@ -1244,7 +1261,7 @@
             <select
               class="card-input__input select"
               id="card_year"
-              bind:value={card_year}
+              bind:value={card.card_year}
               use:bindClass="{{ form: cardForm, name: 'card_year', invalid: 'invalid' }}"
               on:focus={focusInput}
               on:blur={blurInput}
@@ -1298,7 +1315,7 @@
               id="card_cvv"
               v-mask="'####'"
               maxlength="4"
-              bind:value={card_cvv}
+              bind:value={card.card_cvv}
               on:focus={() => isCardFlipped = true}
               on:blur={() => isCardFlipped = false}
               autocomplete="off"
