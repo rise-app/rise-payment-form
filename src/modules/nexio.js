@@ -19,7 +19,7 @@ export const nexio = {
     'invalid_request': ['438', '441'],
     'invalid_currency': ['432'],
     'avs_failed': ['443'],
-    'unable_to_process': ['435', '436', '439', '440', '404', '409'],
+    'unable_to_process': ['442', '435', '436', '439', '440', '404', '409'],
     'unknown': ['500', '501', '503', 'E_NOT_FOUND'],
   },
 
@@ -51,20 +51,20 @@ export const nexio = {
 
   // The URL to save a card
   saveCardUrl: (rise) => nexio.LIVE_MODE || rise.live_mode
-    ? 'https://api.nexiopaysandbox.com/pay/v3/saveCard'
-    : 'https://api.nexiopay.com/pay/v3/saveCard',
+    ? 'https://api.nexiopay.com/pay/v3/saveCard'
+    : 'https://api.nexiopaysandbox.com/pay/v3/saveCard',
 
   // The URL to get a the token from
   getTokenUrl: (rise) => nexio.LIVE_MODE || rise.live_mode
     ? `https://api.rise.store/api/v1/channels/${rise.channel_uuid}/endpoints/handle/nexio-one-time-use-token`
-    : `http://localhost:3002/api/v1/channels/${rise.channel_uuid}/endpoints/handle/nexio-one-time-use-token`,
-    // : `https://api.sandbox.rise.store/api/v1/channels/${rise.channel_uuid}/endpoints/handle/nexio-one-time-use-token`,
+    // : `http://localhost:3002/api/v1/channels/${rise.channel_uuid}/endpoints/handle/nexio-one-time-use-token`,
+    : `https://api.sandbox.rise.store/api/v1/channels/${rise.channel_uuid}/endpoints/handle/nexio-one-time-use-token`,
 
   // The browser encryption library
   crypt: new JSEncrypt(),
 
   // Get a NEXIO single use token
-  getToken: async (rise, _customer) => {
+  getToken: async (rise, _card, _customer) => {
     const headers = {
       'Content-Type': 'application/json',
       'Accept': 'application/json'
@@ -86,7 +86,11 @@ export const nexio = {
       cache: 'no-cache',
       headers: headers,
       body: JSON.stringify({
-        customer: _customer
+        customer: _customer,
+        card: _card
+        // "processingOptions": {
+        //   "checkFraud": true
+        // }
       })
     })
       .then((response) => {
@@ -110,7 +114,7 @@ export const nexio = {
     return nexio.publicKey
   },
 
-  // The NEXIO public key
+  // The NEXIO public key, defaults to Sandbox key
   publicKey: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvWpIQFjQQCPpaIlJKpeg irp5kLkzLB1AxHmnLk73D3TJbAGqr1QmlsWDBtMPMRpdzzUM7ZwX3kzhIuATV4Pe 7RKp3nZlVmcrT0YCQXBrTwqZNh775z58GP2kZs+gVfNqBampJPzSB/hB62KkByhE Cn6grrRjiAVwJyZVEvs/2vrxaEpO+aE16emtX12RgI5JdzdOiNyZEQteU6zRBRJE ocPWVxExaOpVVVJ5+UnW0LcalzA+lRGRTrQJ5JguAPiAOzRPTK/lYFFpCAl/F8wt oAVG1c8zO2NcQ0Pko+fmeidRFxJ/did2btV+9Mkze3mBphwFmvnxa35LF+Cs/XJHDwIDAQAB',
 
   // Transform RiSE fields into a nexio CARD
@@ -142,13 +146,6 @@ export const nexio = {
       // This handles nested customer_fields in dot syntax
       newCustomer[nexio.CUSTOMER_FIELDS[k]] = get(customer, k)
     })
-
-    try {
-      newCustomer.encryptedNumber = nexio.encrypt(newCustomer.encryptedNumber)
-    }
-    catch(err) {
-      return Promise.reject({errors: [{'unable_to_process': err}]})
-    }
 
     return Promise.resolve(newCustomer)
   },
@@ -182,7 +179,10 @@ export const nexio = {
 
   // Submit the Card to Nexio and return the result or errors
   submit: async (rise, config, card) => {
-    nexio.setKey(config.pubKey)
+    // Set the public key from the config
+    nexio.setKey(config.publicKey)
+
+    // Return Response
     return Promise.resolve()
       .then(() => {
         return nexio.transformCard(card)
@@ -201,7 +201,7 @@ export const nexio = {
       })
       .then(([_card, _customer]) => {
         // Get a single use token
-        return nexio.getToken(rise, _customer)
+        return nexio.getToken(rise, _card, _customer)
           .then(token => {
             return [_card, _customer, token]
           })
@@ -211,14 +211,15 @@ export const nexio = {
       })
       .then(([_card, _customer, { token }]) => {
 
-        console.log('BRK TOKEN', token, _customer)
+        console.log('BRK TOKEN', token, _customer, _card)
 
         return fetch(nexio.saveCardUrl(rise), {
           method: 'POST',
           mode: 'cors', // no-cors, *cors, same-origin
           body: JSON.stringify({
             token: token,
-            card: _card
+            card: _card,
+            processingOptions: { verifyAvs: '3' }
           })
         })
       })
