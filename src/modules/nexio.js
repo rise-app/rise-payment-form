@@ -4,6 +4,14 @@ import JSEncrypt from 'jsencrypt'
 import get from 'lodash.get'
 
 export const nexio = {
+  TEST_NUMBERS: {
+    // SUCCESS: 4242424242424242, //	Succeeds and immediately processes the payment.
+    // // REQUIRES_AUTH: 4000002500003155, //	Requires authentication for the initial purchase, but succeeds for subsequent payments (including off-session ones) as long as the card is setup with setup_future_usage.
+    // REQUIRES_AUTH: 4000002760003184, //	Requires authentication for the initial purchase, and fails for subsequent payments (including off-session ones) with an authentication_required decline code.
+    // INSUFFICIENT: 4000008260003178, //	Requires authentication for the initial purchase, but fails for subsequent payments (including off-session ones) with an insufficient_funds decline code.
+    // FAILURE: 4000000000009995, //	Always fails (including the initial purchase) with a decline code of insufficient_funds.
+
+  },
   // Convert NEXIO status codes to RiSE codes
   ERROR_MESSAGES: {
     'fraud': ['431'],
@@ -49,7 +57,8 @@ export const nexio = {
   // The URL to get a the token from
   getTokenUrl: (rise) => nexio.LIVE_MODE || rise.live_mode
     ? `https://api.rise.store/api/v1/channels/${rise.channel_uuid}/endpoints/handle/nexio-one-time-use-token`
-    : `https://api.sandbox.rise.store/api/v1/channels/${rise.channel_uuid}/endpoints/handle/nexio-one-time-use-token`,
+    : `http://localhost:3002/api/v1/channels/${rise.channel_uuid}/endpoints/handle/nexio-one-time-use-token`,
+    // : `https://api.sandbox.rise.store/api/v1/channels/${rise.channel_uuid}/endpoints/handle/nexio-one-time-use-token`,
 
   // The browser encryption library
   crypt: new JSEncrypt(),
@@ -58,8 +67,9 @@ export const nexio = {
   getToken: async (rise, _customer) => {
     const headers = {
       'Content-Type': 'application/json',
-      'Accept': 'application/json',
+      'Accept': 'application/json'
     }
+
     if (rise.key_public) {
       headers['X-APPLICATION-KEY'] = rise.key_public
     }
@@ -70,11 +80,9 @@ export const nexio = {
       headers['Authorization'] = `JWT ${rise.token}`
     }
 
-    console.log('BRK NEXIO RISE HEADER', headers)
-
     return fetch(nexio.getTokenUrl(rise), {
       method: 'POST',
-      mode: 'no-cors', // no-cors, *cors, same-origin
+      mode: 'cors', // no-cors, *cors, same-origin
       cache: 'no-cache',
       headers: headers,
       body: JSON.stringify({
@@ -85,11 +93,14 @@ export const nexio = {
         return response.json()
       })
       .then(res => {
-        console.log('BRK RES', res)
+        console.log('BRK RES', res.data)
         if (res.error) {
           return Promise.reject(res)
         }
-        return res
+        return res.data
+      })
+      .catch(err => {
+        return Promise.reject({errors: [{'unable_to_process': err}]})
       })
   },
 
@@ -204,7 +215,7 @@ export const nexio = {
 
         return fetch(nexio.saveCardUrl(rise), {
           method: 'POST',
-          mode: 'no-cors', // no-cors, *cors, same-origin
+          mode: 'cors', // no-cors, *cors, same-origin
           body: JSON.stringify({
             token: token,
             card: _card
@@ -215,13 +226,14 @@ export const nexio = {
         return response.json()
       })
       .then(res => {
-        console.log('BRK RES', res)
+        console.log('BRK RES NEXIO', res)
         if (res.error) {
           return Promise.reject(res)
         }
         return res
       })
       .catch(err => {
+        console.log('BRK ERR NEXIO', err)
         const errors = nexio.transformError(err)
         return Promise.reject(errors)
       })

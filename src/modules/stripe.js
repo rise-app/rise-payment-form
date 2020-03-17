@@ -8,7 +8,7 @@ export const stripe = {
     INSUFFICIENT: 4000008260003178, //	Requires authentication for the initial purchase, but fails for subsequent payments (including off-session ones) with an insufficient_funds decline code.
     FAILURE: 4000000000009995, //	Always fails (including the initial purchase) with a decline code of insufficient_funds.
 
-},
+  },
   ERROR_MESSAGES: {
     'fraud': ['431'],
     'invalid_cvc': ['437'],
