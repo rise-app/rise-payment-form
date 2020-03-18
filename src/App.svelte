@@ -4,21 +4,22 @@
   let demoToken, demoFailed, demoEdit
   function token(event) {
     console.log('HAVE TOKEN', event)
-    demoToken = event
+    demoToken = event.detail
   }
   function failed(event) {
     console.log('HAVE FAILED', event)
-    demoFailed = event
+    demoFailed = event.detail
   }
   function edit(event) {
     console.log('EDIT CLICKED!', event)
-    demoEdit = event
+    demoEdit = event.detail
   }
 </script>
 
 <style>
   .small-preview {
     width: 450px;
+    height: 175px;
   }
 </style>
 
@@ -61,7 +62,9 @@
     <legend>
      on:token Event
     </legend>
-    {demoToken}
+    <pre>
+    {JSON.stringify(demoToken)}
+    </pre>
   </fieldset>
 </div>
 
@@ -70,7 +73,9 @@
     <legend>
       on:failed Event
     </legend>
-    {demoFailed}
+    <pre>
+    {JSON.stringify(demoFailed)}
+    </pre>
   </fieldset>
 </div>
 
@@ -101,6 +106,8 @@
 <div>
   <fieldset>
     <legend>on:edit Event</legend>
-    {demoEdit}
+    <pre>
+    {JSON.stringify(demoEdit)}
+    </pre>
   </fieldset>
 </div>
