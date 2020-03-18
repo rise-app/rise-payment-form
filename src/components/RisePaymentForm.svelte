@@ -86,6 +86,7 @@
     card={cardValues}
     {...formValues}
     on:token
+    on:failed
   ></svelte:component>
 {:else}
   Missing Payment Type: {type}

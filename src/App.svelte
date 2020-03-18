@@ -1,10 +1,14 @@
 <script>
   import { RisePaymentForm, RisePaymentPreview } from './components/components.module.js'
 
-  let demoToken, demoEdit
+  let demoToken, demoFailed, demoEdit
   function token(event) {
     console.log('HAVE TOKEN', event)
     demoToken = event
+  }
+  function failed(event) {
+    console.log('HAVE FAILED', event)
+    demoFailed = event
   }
   function edit(event) {
     console.log('EDIT CLICKED!', event)
@@ -50,6 +54,7 @@
     submit_text: 'Send it'
   }}"
   on:token={token}
+  on:failed={failed}
 />
 <div>
   <fieldset>
@@ -57,6 +62,15 @@
      on:token Event
     </legend>
     {demoToken}
+  </fieldset>
+</div>
+
+<div>
+  <fieldset>
+    <legend>
+      on:failed Event
+    </legend>
+    {demoFailed}
   </fieldset>
 </div>
 
