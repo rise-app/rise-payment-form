@@ -83,13 +83,26 @@
       : otherCardLastMask
   }
 
-  $: canEditNumber = editable_fields.includes('card_number')
-  $: canEditName = editable_fields.includes('card_name')
-  $: canEditMonth = editable_fields.includes('card_month')
-  $: canEditYear = editable_fields.includes('card_year')
-  $: canEditCvv = editable_fields.includes('card_cvv')
+  let
+    canEditNumber = editable_fields.includes('card_number'),
+    canEditName = editable_fields.includes('card_name'),
+    canEditMonth = editable_fields.includes('card_month'),
+    canEditYear = editable_fields.includes('card_year'),
+    canEditCvv = editable_fields.includes('card_cvv')
 
+  $: {
+    canEditNumber = editable_fields.includes('card_number')
+    canEditName = editable_fields.includes('card_name')
+    canEditMonth = editable_fields.includes('card_month')
+    canEditYear = editable_fields.includes('card_year')
+    canEditCvv = editable_fields.includes('card_cvv')
+  }
+
+  console.log('BRK edit', can_edit, editable_fields, editable_fields.includes('card_number'), canEditNumber)
+
+  // Dispatch event to parent that an edit field was clicked
   function edit(field) {
+    console.log('BRK field', field)
     dispatch('edit', field)
   }
 </script>
@@ -283,13 +296,26 @@
 
   .card-item__edit {
     -webkit-appearance: none;
-    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAeCAYAAABuUU38AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAUxJREFUeNrM1sEJwkAQBdCsngXPHsQO9O5FS7AAMVYgdqAd2IGCDWgFnryLFQiCZ8EGnJUNimiyM/tnk4HNEAg/8y6ZmMRVqz9eUJvRaSbvutCZ347bXVJy/ZnvTmdJ862Me+hAbZCTs6GHpyUi1tTSvPnqTpoWZPUa7W7ncT3vK4h4zVejy8QzM3WhVUO8ykI6jOxoGA4ig3BLHcNFSCGqGAkig2yqgpEiMsjSfY9LxYQg7L6r0X6wS29YJiYQYecemY+wHrXD1+bklGhpAhBDeu/JfIVGxaAQ9sb8CI+CQSJ+QmJg0Ii/EE2MBiIXooHRQhRCkBhNhBcEhLkwf05ZCG8ICCOpk0MULmvDSY2M8UawIRExLIQIEgHDRoghihgRIgiigBEjgiFATBACAgFgghEwSAAGgoBCBBgYAg5hYKAIFYgHBo6w9RRgAFfy160QuV8NAAAAAElFTkSuQmCC");
+    /*background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAeCAYAAABuUU38AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAUxJREFUeNrM1sEJwkAQBdCsngXPHsQO9O5FS7AAMVYgdqAd2IGCDWgFnryLFQiCZ8EGnJUNimiyM/tnk4HNEAg/8y6ZmMRVqz9eUJvRaSbvutCZ347bXVJy/ZnvTmdJ862Me+hAbZCTs6GHpyUi1tTSvPnqTpoWZPUa7W7ncT3vK4h4zVejy8QzM3WhVUO8ykI6jOxoGA4ig3BLHcNFSCGqGAkig2yqgpEiMsjSfY9LxYQg7L6r0X6wS29YJiYQYecemY+wHrXD1+bklGhpAhBDeu/JfIVGxaAQ9sb8CI+CQSJ+QmJg0Ii/EE2MBiIXooHRQhRCkBhNhBcEhLkwf05ZCG8ICCOpk0MULmvDSY2M8UawIRExLIQIEgHDRoghihgRIgiigBEjgiFATBACAgFgghEwSAAGgoBCBBgYAg5hYKAIFYgHBo6w9RRgAFfy160QuV8NAAAAAElFTkSuQmCC");*/
+    /*background-size: 12px;*/
+    /*background-position: 90% center;*/
+    /*background-repeat: no-repeat;*/
+    /*height: 23px;*/
+    height: 100%;
+    /*width: 23px;*/
+    width: 100%;
+    position: absolute;
+    z-index: 100;
+  }
+  .card-item__edit > i {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAFFWlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDggNzkuMTY0MDM2LCAyMDE5LzA4LzEzLTAxOjA2OjU3ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgeG1sbnM6cGhvdG9zaG9wPSJodHRwOi8vbnMuYWRvYmUuY29tL3Bob3Rvc2hvcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RFdnQ9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZUV2ZW50IyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgMjEuMSAoTWFjaW50b3NoKSIgeG1wOkNyZWF0ZURhdGU9IjIwMjAtMDMtMThUMTA6NDk6MDgtMDU6MDAiIHhtcDpNb2RpZnlEYXRlPSIyMDIwLTAzLTE4VDEwOjUwOjAyLTA1OjAwIiB4bXA6TWV0YWRhdGFEYXRlPSIyMDIwLTAzLTE4VDEwOjUwOjAyLTA1OjAwIiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMSIgcGhvdG9zaG9wOklDQ1Byb2ZpbGU9IkRvdCBHYWluIDIwJSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDo3MmQ5N2VmMC05ZTE3LTQzMWYtYjkwZi03MzE5N2U2MTgwZmQiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6NzJkOTdlZjAtOWUxNy00MzFmLWI5MGYtNzMxOTdlNjE4MGZkIiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6NzJkOTdlZjAtOWUxNy00MzFmLWI5MGYtNzMxOTdlNjE4MGZkIj4gPHhtcE1NOkhpc3Rvcnk+IDxyZGY6U2VxPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0iY3JlYXRlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDo3MmQ5N2VmMC05ZTE3LTQzMWYtYjkwZi03MzE5N2U2MTgwZmQiIHN0RXZ0OndoZW49IjIwMjAtMDMtMThUMTA6NDk6MDgtMDU6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCAyMS4xIChNYWNpbnRvc2gpIi8+IDwvcmRmOlNlcT4gPC94bXBNTTpIaXN0b3J5PiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PjE8yzAAAADqSURBVDiNjdGvbsJQGIbxd6gJJFcAS0gwQ5CgULBLIJnccEgswUECl8AFcBVoPEHObSMhuC0TRTB4EG3TU+D8+Sr7/NrvtEIB14BPVtQRCsnHxPNLMwQMyeaHhh/U2Bvkwx1P6V2RL1c+A045EtG255PkmWf6iCo7Ijr2Q8+MvdO3tO2f1cxj8p7ecy2TTUTHDpz5LfDk18Cb50FAboJxSJ6BwDwFz/zf5C/3f6kQRcRrjlhzJB5Y84TocnQvk4IqsDWIM0fiDYAtFUSXP3eOxDxZ5JsyouTOkdgk4MCCgi+PwZIRLR79MUIXd0TqHkNdx84AAAAASUVORK5CYII=');
     background-size: 12px;
     background-position: 90% center;
     background-repeat: no-repeat;
+    position: absolute;
     height: 23px;
     width: 23px;
-    position: absolute;
+    left: -23px;
   }
 
   .card-item__typeImg {
@@ -308,6 +334,7 @@
     display: block;
     padding: 10px;
     /*cursor: pointer;*/
+    position: relative;
   }
   @media screen and (max-width: 480px) {
     .card-item__info {
@@ -377,6 +404,7 @@
     margin-bottom: 10px;
     padding: 10px 10px;
     /*cursor: pointer;*/
+    position: relative;
   }
   @media screen and (max-width: 480px) {
     .card-item__number {
@@ -595,7 +623,9 @@
           </div>
           <label class="card-item__number" bind:this={refs.card_number_last}>
             {#if can_edit && canEditNumber}
-              <div class="card-item__edit" on:click={e=> edit('card_number')}></div>
+              <div class="card-item__edit" on:click={e=> edit('card_number')}>
+                <i></i>
+              </div>
             {/if}
             {#each cardNumberMask as n, index (index)}
               <div class="card-item__numberItem" class:active={n.trim() === ''}>
@@ -624,7 +654,9 @@
           <div class="card-item__content">
             <label class="card-item__info" bind:this={refs.card_name}>
               {#if can_edit && canEditName}
-                <div class="card-item__edit" on:click={e=> edit('card_name')}></div>
+                <div class="card-item__edit" on:click={e=> edit('card_name')}>
+                  <i></i>
+                </div>
               {/if}
               <div class="card-item__holder">Card Holder</div>
               {#if card.card_name && card.card_name.length}
@@ -649,7 +681,9 @@
               <label class="card-item__dateTitle">Expires</label>
               <label class="card-item__dateItem">
                 {#if can_edit && canEditMonth}
-                  <div class="card-item__edit" on:click={e=> edit('card_month')}></div>
+                  <div class="card-item__edit" on:click={e=> edit('card_month')}>
+                    <i></i>
+                  </div>
                 {/if}
                 {#each [card.card_month] as card_month (card_month)}
                   <span
@@ -661,7 +695,9 @@
               /
               <label class="card-item__dateItem">
                 {#if can_edit && canEditYear}
-                  <div class="card-item__edit" on:click={e=> edit('card_year')}></div>
+                  <div class="card-item__edit" on:click={e=> edit('card_year')}>
+<!--                    <i></i>-->
+                  </div>
                 {/if}
                 {#each [card.card_year] as card_year (card_year)}
                   <span in:fly={{y:-6}} out:fly={{y:6}}>{card_year ? String(card_year).slice(2,4) : 'YY'}</span>
@@ -680,7 +716,9 @@
           <div class="card-item__cvvTitle">CVV</div>
           <div class="card-item__cvvBand">
             {#if can_edit && canEditCvv}
-              <div class="card-item__edit" on:click={e=> edit('card_cvv')}></div>
+              <div class="card-item__edit" on:click={e=> edit('card_cvv')}>
+                <i></i>
+              </div>
             {/if}
             {card.card_cvv}
           </div>
