@@ -46,16 +46,13 @@ export const nexio = {
     'country_code': 'billToCountry',
   },
 
-  // If requests should use the sandbox or not
-  LIVE_MODE: false,
-
   // The URL to save a card
-  saveCardUrl: (rise) => nexio.LIVE_MODE || rise.live_mode
+  saveCardUrl: (rise) => rise.live_mode
     ? 'https://api.nexiopay.com/pay/v3/saveCard'
     : 'https://api.nexiopaysandbox.com/pay/v3/saveCard',
 
   // The URL to get a the token from
-  getTokenUrl: (rise) => nexio.LIVE_MODE || rise.live_mode
+  getTokenUrl: (rise) => rise.live_mode
     ? `https://api.rise.store/api/v1/channels/${rise.channel_uuid}/endpoints/handle/nexio-one-time-use-token`
     // : `http://localhost:3002/api/v1/channels/${rise.channel_uuid}/endpoints/handle/nexio-one-time-use-token`,
     : `https://api.sandbox.rise.store/api/v1/channels/${rise.channel_uuid}/endpoints/handle/nexio-one-time-use-token`,
