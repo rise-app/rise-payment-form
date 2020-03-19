@@ -46,6 +46,10 @@ export const nexio = {
     'country_code': 'billToCountry',
   },
 
+  CART_FIELDS: {},
+
+  CART_ITEM_FIELDS: {},
+
   // The URL to save a card
   saveCardUrl: (rise) => rise.live_mode
     ? 'https://api.nexiopay.com/pay/v3/saveCard'
@@ -54,18 +58,31 @@ export const nexio = {
   // The URL to get a the token from
   getTokenUrl: (rise) => rise.live_mode
     ? `https://api.rise.store/api/v1/channels/${rise.channel_uuid}/endpoints/handle/nexio-one-time-use-token`
-    // : `http://localhost:3002/api/v1/channels/${rise.channel_uuid}/endpoints/handle/nexio-one-time-use-token`,
+
     : `https://api.sandbox.rise.store/api/v1/channels/${rise.channel_uuid}/endpoints/handle/nexio-one-time-use-token`,
 
   // The browser encryption library
   crypt: new JSEncrypt(),
 
-  // Get a NEXIO single use token
-  getToken: async (rise, _card, _customer) => {
+  // Get a NEXIO single use token from RiSE
+  getSingleUseToken: async (rise, config = { processingOptions: {}}, _card, _customer) => {
     const headers = {
       'Content-Type': 'application/json',
       'Accept': 'application/json'
     }
+    const processingOptions = {
+      checkFraud: get(config, 'processingOptions.checkFraud', false),
+      check3ds: get(config, 'processingOptions.check3ds', false),
+      verboseResponse: get(config, 'processingOptions.verboseResponse', false),
+      webhookUrl: get(config, 'processingOptions.webhookUrl', ""),
+      webhookFailUrl: get(config, 'processingOptions.webhookFailUrl', ""),
+      // // merchantId: string,
+      // paymentOptionTag: "switch",
+      // saveCardToken: true,
+      // verboseResponse: true,
+    }
+
+    const tokenUrl = nexio.getTokenUrl(rise)
 
     if (rise.key_public) {
       headers['X-APPLICATION-KEY'] = rise.key_public
@@ -77,24 +94,21 @@ export const nexio = {
       headers['Authorization'] = `JWT ${rise.token}`
     }
 
-    return fetch(nexio.getTokenUrl(rise), {
+    return fetch(tokenUrl, {
       method: 'POST',
       mode: 'cors', // no-cors, *cors, same-origin
       cache: 'no-cache',
       headers: headers,
       body: JSON.stringify({
         customer: _customer,
-        card: _card
-        // "processingOptions": {
-        //   "checkFraud": true
-        // }
+        card: _card,
+        processingOptions: processingOptions
       })
     })
       .then((response) => {
         return response.json()
       })
       .then(res => {
-        console.log('BRK RES', res.data)
         if (res.error) {
           return Promise.reject(res)
         }
@@ -103,6 +117,32 @@ export const nexio = {
       .catch(err => {
         return Promise.reject({errors: [{'unable_to_process': err}]})
       })
+  },
+
+  // Send encrpted card to Nexio to return a Card token to use in later transactions
+  getCardToken: async (rise, config, card, customer, token) => {
+    return fetch(nexio.saveCardUrl(rise), {
+      method: 'POST',
+      mode: 'cors', // no-cors, *cors, same-origin
+      body: JSON.stringify({
+        token: token,
+        customer: customer,
+        card: card,
+        processingOptions: {
+          checkFraud: false,
+          verboseResponse: true,
+          verifyAvs: 2,
+          verifyCvc: false,
+          webhookUrl: '',
+          webhookFailUrl: ''
+        },
+        // data: {
+        //   card: {
+        //     securityCode: _card.securityCode
+        //   }
+        // }
+      })
+    })
   },
 
   // Set the Public key in which to encrpyt the card number
@@ -124,9 +164,11 @@ export const nexio = {
       newCard[nexio.CARD_FIELDS[k]] = get(card, k)
     })
 
+    // Should encrypt card_number to encryptedNumber so that we don't pass the number anywhere from the client
     try {
       newCard.encryptedNumber = nexio.encrypt(newCard.encryptedNumber)
     }
+    // Reject this as unable to process error if unable to encrypt
     catch(err) {
       return Promise.reject({errors: [{'unable_to_process': err}]})
     }
@@ -141,7 +183,11 @@ export const nexio = {
 
     keys.forEach((k) => {
       // This handles nested customer_fields in dot syntax
-      newCustomer[nexio.CUSTOMER_FIELDS[k]] = get(customer, k)
+      const value = get(customer, k)
+
+      if (value && value !== '') {
+        newCustomer[nexio.CUSTOMER_FIELDS[k]] = value
+      }
     })
 
     return Promise.resolve(newCustomer)
@@ -150,7 +196,6 @@ export const nexio = {
   // TODO, make sure this is right
   // Transform Nexio error codes into RiSE error codes
   transformError: ({error, message}) => {
-    console.log('BRK errors', error, message)
 
     const newErrors = []
     const errorKeys = Object.keys(nexio.ERROR_MESSAGES)
@@ -175,7 +220,7 @@ export const nexio = {
   },
 
   // Submit the Card to Nexio and return the result or errors
-  submit: async (rise, config, card) => {
+  submit: async (rise, config, cart, customer, card) => {
     // Set the public key from the config
     nexio.setKey(config.publicKey)
 
@@ -198,37 +243,29 @@ export const nexio = {
       })
       .then(([_card, _customer]) => {
         // Get a single use token
-        return nexio.getToken(rise, _card, _customer)
-          .then(token => {
-            return [_card, _customer, token]
+        return nexio.getSingleUseToken(rise, config, _card, _customer)
+          .then(res => {
+            return [_card, _customer, res]
           })
           .catch(err => {
             return Promise.reject({errors: [{'unable_to_process': err}]})
           })
       })
       .then(([_card, _customer, { token }]) => {
-
-        console.log('BRK TOKEN', token, _customer, _card)
-
-        return fetch(nexio.saveCardUrl(rise), {
-          method: 'POST',
-          mode: 'cors', // no-cors, *cors, same-origin
-          body: JSON.stringify({
-            token: token,
-            card: _card,
-            processingOptions: { verifyAvs: '3' }
-          })
-        })
+        return nexio.getCardToken(rise, config, _card, _customer, token)
       })
       .then((response) => {
         return response.json()
       })
       .then(res => {
-        console.log('BRK RES NEXIO', res)
         if (res.error) {
           return Promise.reject(res)
         }
-        return res
+
+        return {
+          token: res.token.token,
+          success: res
+        }
       })
       .catch(err => {
         console.log('BRK ERR NEXIO', err)

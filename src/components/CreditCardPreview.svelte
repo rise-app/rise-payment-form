@@ -98,8 +98,6 @@
     canEditCvv = editable_fields.includes('card_cvv')
   }
 
-  console.log('BRK edit', can_edit, editable_fields, editable_fields.includes('card_number'), canEditNumber)
-
   // Dispatch event to parent that an edit field was clicked
   function edit(field) {
     console.log('BRK field', field)

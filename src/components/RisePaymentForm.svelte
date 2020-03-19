@@ -14,6 +14,8 @@
     stripe = {},
     rave = {},
     type = 'card',
+    cart = {},
+    customer = {},
     card = {},
     check = {},
     apple = {}
@@ -86,6 +88,7 @@
     card={cardValues}
     {...formValues}
     on:token
+    on:success
     on:failed
   ></svelte:component>
 {:else}

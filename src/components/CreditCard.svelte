@@ -15,15 +15,27 @@
 
   // IMPORTS
   export let
-    rise = {}, // The standard RISE details eg. channel_uuid, session, token, etc.
+    // The standard RISE details eg. channel_uuid, session, token, etc.
+    rise = {},
+    // RiSE ChannelCart
+    cart = {},
+    // RiSE ChannelCustomer
+    customer = {},
 
+
+          // Available Gateways to use
     nexio = {},
     stripe = {},
     rave = {},
     apple = {},
 
+    // If something is already happening
     is_processing = false,
+
+    // The gateway to use
     gateway_type = 'rise',
+
+    // Will be set if not set
     card_type,
 
     // The card Object
@@ -304,32 +316,11 @@
   async function submit(event) {
     processing()
 
-    return selectedGateway.submit(rise, selectedGatewayConfig, {
-      is_processing,
-      gateway_type,
-      card_type,
-
+    return selectedGateway.submit(rise, selectedGatewayConfig, cart, customer, {
+      // Form Values
       ...card,
-      //
-      // // Required Fields
-      // card_name,
-      // card_number,
-      // card_month,
-      // card_year,
-      // card_cvv,
-      //
-      // // Optional Fields based on Gateway
-      // email,
-      // phone,
-      // address_1,
-      // address_2,
-      // address_3,
-      // city,
-      // postal_code,
-      // province_code,
-      // country_code,
-
-      //
+      // Additional Relative Card Data
+      card_type,
       ip,
     })
     .then(res => {
@@ -347,11 +338,19 @@
     dispatch('failed', errors)
   }
 
+  function success(res) {
+    dispatch('success', res.success)
+  }
+  function token(res) {
+    dispatch('token', res.token)
+  }
+
   function complete(event) {
     notProcessing()
     submit_text = 'Submitted!'
     btnDisabled = true
-    dispatch('token', event)
+    token(event)
+    success(event)
   }
 
 </script>

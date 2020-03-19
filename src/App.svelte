@@ -1,10 +1,14 @@
 <script>
   import { RisePaymentForm, RisePaymentPreview } from './components/components.module.js'
 
-  let demoToken, demoFailed, demoEdit
+  let demoToken, demoSuccess, demoFailed, demoEdit
   function token(event) {
     console.log('HAVE TOKEN', event)
     demoToken = event.detail
+  }
+  function success(event) {
+    console.log('HAVE SUCCESS', event)
+    demoSuccess = event.detail
   }
   function failed(event) {
     console.log('HAVE FAILED', event)
@@ -30,8 +34,18 @@
     key_public: 'pk_00000000-0000-0000-0000-000000000000',
     live_mode: false
   }}"
+  cart="{{}}"
+  customer="{{}}"
   nexio="{{
     live_mode: false,
+    processingOptions: {
+      checkFraud: false,
+      check3ds: true,
+      saveCardToken: true,
+      verboseResponse: true,
+      webhookUrl: '',
+      webhookFailUrl: ''
+    },
     publicKey: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvWpIQFjQQCPpaIlJKpeg irp5kLkzLB1AxHmnLk73D3TJbAGqr1QmlsWDBtMPMRpdzzUM7ZwX3kzhIuATV4Pe 7RKp3nZlVmcrT0YCQXBrTwqZNh775z58GP2kZs+gVfNqBampJPzSB/hB62KkByhE Cn6grrRjiAVwJyZVEvs/2vrxaEpO+aE16emtX12RgI5JdzdOiNyZEQteU6zRBRJE ocPWVxExaOpVVVJ5+UnW0LcalzA+lRGRTrQJ5JguAPiAOzRPTK/lYFFpCAl/F8wt oAVG1c8zO2NcQ0Pko+fmeidRFxJ/did2btV+9Mkze3mBphwFmvnxa35LF+Cs/XJHDwIDAQAB'
   }}"
   card="{{
@@ -55,6 +69,7 @@
     submit_text: 'Send it'
   }}"
   on:token={token}
+  on:success={success}
   on:failed={failed}
 />
 <div>
@@ -67,7 +82,16 @@
     </pre>
   </fieldset>
 </div>
-
+<div>
+  <fieldset>
+    <legend>
+      on:success Event
+    </legend>
+    <pre>
+    {JSON.stringify(demoSuccess)}
+    </pre>
+  </fieldset>
+</div>
 <div>
   <fieldset>
     <legend>
@@ -87,9 +111,18 @@
     key_public: 'pk_00000000-0000-0000-0000-000000000000',
     live_mode: false
   }}"
+  customer="{{}}"
   nexio="{{
     live_mode: false,
-    publicKey: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvWpIQFjQQCPpaIlJKpeg irp5kLkzLB1AxHmnLk73D3TJbAGqr1QmlsWDBtMPMRpdzzUM7ZwX3kzhIuATV4Pe 7RKp3nZlVmcrT0YCQXBrTwqZNh775z58GP2kZs+gVfNqBampJPzSB/hB62KkByhE Cn6grrRjiAVwJyZVEvs/2vrxaEpO+aE16emtX12RgI5JdzdOiNyZEQteU6zRBRJE ocPWVxExaOpVVVJ5+UnW0LcalzA+lRGRTrQJ5JguAPiAOzRPTK/lYFFpCAl/F8wt oAVG1c8zO2NcQ0Pko+fmeidRFxJ/did2btV+9Mkze3mBphwFmvnxa35LF+Cs/XJHDwIDAQAB'
+    processingOptions: {
+      checkFraud: false,
+      check3ds: true,
+      saveCardToken: true,
+      verboseResponse: true,
+      webhookUrl: '',
+      webhookFailUrl: ''
+    },
+    publicKey: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvWpIQFjQQCPpaIlJKpeg irp5kLkzLB1AxHmnLk73D3TJbAGqr1QmlsWDBtMPMRpdzzUM7ZwX3kzhIuATV4Pe 7RKp3nZlVmcrT0YCQXBrTwqZNh775z58GP2kZs+gVfNqBampJPzSB/hB62KkByhE Cn6grrRjiAVwJyZVEvs/2vrxaEpO+aE16emtX12RgI5JdzdOiNyZEQteU6zRBRJE ocPWVxExaOpVVVJ5+UnW0LcalzA+lRGRTrQJ5JguAPiAOzRPTK/lYFFpCAl/F8wt oAVG1c8zO2NcQ0Pko+fmeidRFxJ/did2btV+9Mkze3mBphwFmvnxa35LF+Cs/XJHDwIDAQAB',
   }}"
   card="{{
     card_type: 'visa',
