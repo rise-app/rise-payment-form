@@ -19,8 +19,12 @@ export const nexio = {
     'invalid_request': ['438', '441'],
     'invalid_currency': ['432'],
     'avs_failed': ['443'],
-    'unable_to_process': ['442', '435', '436', '439', '440', '404', '409'],
+    'unable_to_process': ['442', '434', '435', '436', '439', '440', '404', '409'],
     'unknown': ['500', '501', '503', 'E_NOT_FOUND'],
+  },
+
+  ERROR_MESSAGE_OVERRIDES: {
+    'fraud': 'We are unable to process your request at this moment, please contact customer support.'
   },
 
   // Convert RiSE fields to NEXIO Card Fields
@@ -58,7 +62,7 @@ export const nexio = {
   // The URL to get a the token from
   getTokenUrl: (rise) => rise.live_mode
     ? `https://api.rise.store/api/v1/channels/${rise.channel_uuid}/endpoints/handle/nexio-one-time-use-token`
-
+    // : `http://localhost:3002/api/v1/channels/${rise.channel_uuid}/endpoints/handle/nexio-one-time-use-token`,
     : `https://api.sandbox.rise.store/api/v1/channels/${rise.channel_uuid}/endpoints/handle/nexio-one-time-use-token`,
 
   // The browser encryption library
@@ -202,6 +206,9 @@ export const nexio = {
 
     errorKeys.forEach((key) => {
       if (nexio.ERROR_MESSAGES[key].includes(`${error}`)) {
+        if (Object.keys(nexio.ERROR_MESSAGE_OVERRIDES).includes(key)) {
+          message = nexio.ERROR_MESSAGE_OVERRIDES[key]
+        }
         newErrors.push({[key]: message })
       }
     })
