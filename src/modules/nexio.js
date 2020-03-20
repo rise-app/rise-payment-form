@@ -1,6 +1,15 @@
 // https://docs.nexiopay.com/#browser-based-encryption
 
+// Adds SSR support
+if (!navigator) {
+  global.navigator = { appName: 'nodejs' } // fake the navigator object
+}
+if (!window) {
+  global.window = {} // fake the window object
+}
+
 import JSEncrypt from 'jsencrypt'
+// import JSEncrypt from 'node-rsa'
 import get from 'lodash.get'
 
 export const nexio = {
@@ -65,8 +74,15 @@ export const nexio = {
     // : `http://localhost:3002/api/v1/channels/${rise.channel_uuid}/endpoints/handle/nexio-one-time-use-token`,
     : `https://api.sandbox.rise.store/api/v1/channels/${rise.channel_uuid}/endpoints/handle/nexio-one-time-use-token`,
 
-  // The browser encryption library
-  crypt: new JSEncrypt(),
+  // The browser only encryption library
+  setCrypt: function() {
+    if (!nexio.crypt) {
+      return nexio.crypt = new JSEncrypt()
+    }
+  },
+
+  // The loaded encryption library
+  crypt: null,
 
   // Get a NEXIO single use token from RiSE
   getSingleUseToken: async (rise, config = { processingOptions: {}}, _card, _customer, _cart) => {
@@ -236,7 +252,11 @@ export const nexio = {
   // Submit the Card to Nexio and return the result or errors
   submit: async (rise, config, cart, customer, card) => {
     // Set the public key from the config
-    nexio.setKey(config.publicKey)
+    if (config.publicKey) {
+      nexio.setKey(config.publicKey)
+    }
+    // Initiate the Crypt library so it is only instantiated when this is called
+    nexio.setCrypt()
 
     // Return Response
     return Promise.resolve()

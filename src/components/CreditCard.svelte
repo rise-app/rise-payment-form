@@ -5,13 +5,7 @@
   import { fly } from 'svelte/transition'
   import { spring } from 'svelte/motion'
 
-  import {
-    rise as riseGateway,
-    nexio as nexioGateway,
-    apple as appleGateway,
-    stripe as stripeGateway,
-    rave as raveGateway
-  } from '../modules'
+  import * as modules from '../modules'
 
   // IMPORTS
   export let
@@ -188,11 +182,11 @@
 
   // Available Gateways
   const GATEWAYS = {
-    'rise': riseGateway,
-    'nexio': nexioGateway,
-    'rave': raveGateway,
-    'apple': appleGateway,
-    'stripe': stripeGateway
+    'rise': null,
+    'nexio': null,
+    'rave': null,
+    'apple': null,
+    'stripe': null
   }
 
   const GATEWAY_CONFIGS = {
@@ -203,11 +197,29 @@
     'stripe': stripe
   }
 
-  let selectedGateway = GATEWAYS[gateway_type]
-  let selectedGatewayConfig = GATEWAY_CONFIGS[gateway_type]
+  let selectedGateway // = GATEWAYS[gateway_type]
+  let selectedGatewayConfig // = GATEWAY_CONFIGS[gateway_type]
 
-  onMount(function() {
+  onMount(async function() {
+
+    GATEWAYS.rise = modules.rise
+    GATEWAYS.nexio = modules.nexio
+    GATEWAYS.apple = modules.apple
+    GATEWAYS.stripe = modules.stripe
+    GATEWAYS.rave = modules.rave
+
+    // import {
+    //   rise as riseGateway,
+    //   nexio as nexioGateway,
+    //   apple as appleGateway,
+    //   stripe as stripeGateway,
+    //   rave as raveGateway
+    // } from '../modules'
+
+    selectedGateway = GATEWAYS[gateway_type]
+    selectedGatewayConfig = GATEWAY_CONFIGS[gateway_type]
     document.getElementById('card_number').focus()
+
   })
 
   // Disable the submit button if not valid, and is processing
@@ -1260,7 +1272,7 @@
             class:invalid={!$cardForm.card_month.valid || !$cardForm.card_year.valid}
             use:bindClass="{{ form: cardForm, name: 'card_month', invalid: 'invalid' }}"
           >
-            <label for="card_month" class="card-input__label">Expiration Date</label>
+            <label for="card_month" class="card-input__label">{ card_expiration_label }</label>
             <select
               class="card-input__input select"
               id="card_month"
