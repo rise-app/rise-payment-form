@@ -69,21 +69,22 @@ export const nexio = {
   crypt: new JSEncrypt(),
 
   // Get a NEXIO single use token from RiSE
-  getSingleUseToken: async (rise, config = { processingOptions: {}}, _card, _customer) => {
+  getSingleUseToken: async (rise, config = { processingOptions: {}}, _card, _customer, _cart) => {
     const headers = {
       'Content-Type': 'application/json',
       'Accept': 'application/json'
     }
     const processingOptions = {
       checkFraud: get(config, 'processingOptions.checkFraud', false),
+      verifyCvc: get(config, 'processingOptions.verifyCvc', false),
+      verifyAvs: get(config, 'processingOptions.verifyAvs', false),
       check3ds: get(config, 'processingOptions.check3ds', false),
+      saveCardToken: get(config, 'processingOptions.saveCardToken', false),
       verboseResponse: get(config, 'processingOptions.verboseResponse', false),
       webhookUrl: get(config, 'processingOptions.webhookUrl', ""),
       webhookFailUrl: get(config, 'processingOptions.webhookFailUrl', ""),
-      // // merchantId: string,
+
       // paymentOptionTag: "switch",
-      // saveCardToken: true,
-      // verboseResponse: true,
     }
 
     const tokenUrl = nexio.getTokenUrl(rise)
@@ -124,7 +125,20 @@ export const nexio = {
   },
 
   // Send encrpted card to Nexio to return a Card token to use in later transactions
-  getCardToken: async (rise, config, card, customer, token) => {
+  getCardToken: async (rise, config, card, customer, cart, token) => {
+    const processingOptions = {
+      checkFraud: get(config, 'processingOptions.checkFraud', false),
+      verifyCvc: get(config, 'processingOptions.verifyCvc', false),
+      verifyAvs: get(config, 'processingOptions.verifyAvs', false),
+      check3ds: get(config, 'processingOptions.check3ds', false),
+      saveCardToken: get(config, 'processingOptions.saveCardToken', false),
+      verboseResponse: get(config, 'processingOptions.verboseResponse', false),
+      webhookUrl: get(config, 'processingOptions.webhookUrl', ""),
+      webhookFailUrl: get(config, 'processingOptions.webhookFailUrl', ""),
+
+      // paymentOptionTag: "switch",
+    }
+
     return fetch(nexio.saveCardUrl(rise), {
       method: 'POST',
       mode: 'cors', // no-cors, *cors, same-origin
@@ -132,14 +146,7 @@ export const nexio = {
         token: token,
         customer: customer,
         card: card,
-        processingOptions: {
-          checkFraud: false,
-          verboseResponse: true,
-          verifyAvs: 2,
-          verifyCvc: false,
-          webhookUrl: '',
-          webhookFailUrl: ''
-        },
+        processingOptions: processingOptions,
         // data: {
         //   card: {
         //     securityCode: _card.securityCode
@@ -238,7 +245,7 @@ export const nexio = {
           .then((_card) => {
             return nexio.transformCustomer(card)
               .then(_customer => {
-                return [_card, _customer]
+                return [_card, _customer, cart]
               })
               .catch(err => {
                 return Promise.reject({errors: [{'unable_to_process': err}]})
@@ -248,18 +255,18 @@ export const nexio = {
             return Promise.reject({errors: [{'unable_to_process': err}]})
           })
       })
-      .then(([_card, _customer]) => {
+      .then(([_card, _customer, _cart]) => {
         // Get a single use token
-        return nexio.getSingleUseToken(rise, config, _card, _customer)
+        return nexio.getSingleUseToken(rise, config, _card, _customer, _cart)
           .then(res => {
-            return [_card, _customer, res]
+            return [_card, _customer, _cart, res]
           })
           .catch(err => {
             return Promise.reject({errors: [{'unable_to_process': err}]})
           })
       })
-      .then(([_card, _customer, { token }]) => {
-        return nexio.getCardToken(rise, config, _card, _customer, token)
+      .then(([_card, _customer, _cart, { token }]) => {
+        return nexio.getCardToken(rise, config, _card, _customer, _cart, token)
       })
       .then((response) => {
         return response.json()

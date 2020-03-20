@@ -40,6 +40,8 @@
     live_mode: false,
     processingOptions: {
       checkFraud: false,
+      verifyCvc: false,
+      // verifyAvs: 3,
       check3ds: true,
       saveCardToken: true,
       verboseResponse: true,
