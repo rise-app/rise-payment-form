@@ -595,7 +595,7 @@
         <div class="card-item__cover">
           <img
             alt="card"
-            src={'images/' + currentCardBackground + '.jpeg'}
+            src={'https://cdn.rise.store/payment-form/images/' + currentCardBackground + '.jpeg'}
             class="card-item__bg"
           >
         </div>
@@ -603,7 +603,7 @@
           <div class="card-item__top">
             <img
               alt="card"
-              src="images/chip.png"
+              src="https://cdn.rise.store/payment-form/images/chip.png"
               class="card-item__chip"
             >
             <div class="card-item__type">
@@ -612,7 +612,7 @@
                   <img
                     in:fly={{y:-20}}
                     out:fly={{y:20}}
-                    src={'images/' + card_type + '.png'}
+                    src={'https://cdn.rise.store/payment-form/images/' + card_type + '.png'}
                     alt={card_type}
                     class="card-item__typeImg"
                   >
@@ -708,7 +708,7 @@
       </div>
       <div class="card-item__side back">
         <div class="card-item__cover">
-          <img alt="card" src={'images/' + currentCardBackground + '.jpeg'} class="card-item__bg">
+          <img alt="card" src={'https://cdn.rise.store/payment-form/images/' + currentCardBackground + '.jpeg'} class="card-item__bg">
         </div>
         <div class="card-item__band"></div>
         <div class="card-item__cvv">
@@ -724,7 +724,7 @@
           <div class="card-item__type">
             {#if card_type}
               {#each [card_type] as card_type (card_type)}
-                <img in:fly={{y:-20}} out:fly={{y:20}} alt="card" src={'images/' + card_type + '.png'} class="card-item__typeImg">
+                <img in:fly={{y:-20}} out:fly={{y:20}} alt="card" src={'https://cdn.rise.store/payment-form/images/' + card_type + '.png'} class="card-item__typeImg">
               {/each}
             {/if}
           </div>

@@ -1,7 +1,7 @@
 {
 	"name": "@rise/payment-form",
 	"repository": "https://github.com/rise-app/rise-payment-form",
-	"version": "1.0.0-alpha.5",
+	"version": "1.0.0-alpha.6",
 	"main": "dist/index.min.js",
 	"module": "dist/index.min.mjs",
 	"scripts": {
