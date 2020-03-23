@@ -1,15 +1,16 @@
 // https://docs.nexiopay.com/#browser-based-encryption
 
 // Adds SSR support
-if (!navigator) {
-  global.navigator = { appName: 'nodejs' } // fake the navigator object
-}
-if (!window) {
-  global.window = {} // fake the window object
-}
+// if (!navigator) {
+//   global.navigator = { appName: 'nodejs' } // fake the navigator object
+// }
+// if (!window) {
+//   global.window = {} // fake the window object
+// }
 
-import JSEncrypt from 'jsencrypt'
-// import JSEncrypt from 'node-rsa'
+import JSEncrypt from 'node-jsencrypt'
+// import NodeRSA from 'node-rsa'
+// import forge from 'node-forge'
 import get from 'lodash.get'
 
 export const nexio = {
@@ -77,7 +78,13 @@ export const nexio = {
   // The browser only encryption library
   setCrypt: function() {
     if (!nexio.crypt) {
-      return nexio.crypt = new JSEncrypt()
+      nexio.crypt = new JSEncrypt()
+      nexio.crypt.setKey(nexio.publicKey)
+      return nexio.crypt
+      // const options = { encryptionScheme: 'pkcs1' }
+      // return nexio.crypt = new NodeRSA(nexio.publicKey, 'pkcs8-public', options)
+      // const rsa = forge.pki.rsa
+      // return nexio.crypt = new NodeRSA(nexio.publicKey, 'pkcs8-public', options)
     }
   },
 
@@ -245,8 +252,7 @@ export const nexio = {
 
   // Encrypt a string using the public key
   encrypt: (str) => {
-    nexio.crypt.setKey(nexio.publicKey)
-    return nexio.crypt.encrypt(str)
+    return nexio.crypt.encrypt(str, 'base64')
   },
 
   // Submit the Card to Nexio and return the result or errors

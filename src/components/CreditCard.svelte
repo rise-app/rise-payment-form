@@ -5,7 +5,7 @@
   import { fly } from 'svelte/transition'
   import { spring } from 'svelte/motion'
 
-  import * as modules from '../modules'
+  import { rave as raveModule, nexio as nexioModule, stripe as stripeModule, rise as riseModule } from '../modules'
 
   // IMPORTS
   export let
@@ -202,11 +202,11 @@
 
   onMount(async function() {
 
-    GATEWAYS.rise = modules.rise
-    GATEWAYS.nexio = modules.nexio
-    GATEWAYS.apple = modules.apple
-    GATEWAYS.stripe = modules.stripe
-    GATEWAYS.rave = modules.rave
+    GATEWAYS.rise = riseModule
+    GATEWAYS.nexio = nexioModule
+    // GATEWAYS.apple = modules.apple
+    // GATEWAYS.stripe = modules.stripe
+    // GATEWAYS.rave = modules.rave
 
     // import {
     //   rise as riseGateway,
