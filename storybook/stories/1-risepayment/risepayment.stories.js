@@ -1,4 +1,5 @@
 import { storiesOf } from '@storybook/svelte'
+import { action } from '@storybook/addon-actions'
 import RisePaymentForm from '../../../src/components/RisePaymentForm.svelte'
 import RisePaymentPreview from '../../../src/components/RisePaymentPreview.svelte'
 import markdownNotes from './risepayment.stories.md'

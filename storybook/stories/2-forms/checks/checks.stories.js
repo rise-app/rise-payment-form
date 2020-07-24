@@ -1,4 +1,5 @@
 import { storiesOf } from '@storybook/svelte'
+import { action } from '@storybook/addon-actions'
 // import Check from '../../../../src/components/Check.svelte'
 // import CheckPreview from '../../../../src/components/CheckPreview.svelte'
 import markdownNotes from './checks.stories.md'
