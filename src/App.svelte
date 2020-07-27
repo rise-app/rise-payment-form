@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { RisePaymentForm, RisePaymentPreview } from './components/components.module.js'
 
   let demoToken, demoSuccess, demoFailed, demoEdit

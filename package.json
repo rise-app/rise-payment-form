@@ -4,6 +4,7 @@
   "version": "1.0.0-alpha.6",
   "main": "dist/index.min.js",
   "module": "dist/index.min.mjs",
+  "svelte": "src/components/components.module.js",
   "scripts": {
     "build": "rollup -c",
     "cy:open": "cypress open",
@@ -13,7 +14,7 @@
     "prepublishOnly": "npm run build",
     "start": "sirv public",
     "test": "start-server-and-test dev http://localhost:5000 cy:run",
-    "stories": "start-storybook",
+    "stories": "start-storybook -p 5001",
     "build-stories": "build-storybook",
     "static-stories": "build-storybook -c .storybook -o .out"
   },
@@ -44,7 +45,6 @@
       "git add"
     ]
   },
-  "svelte": "src/components/components.module.js",
   "dependencies": {
     "jsencrypt": "3.0.0-rc.1",
     "lodash.get": "4.4.2",
@@ -96,6 +96,9 @@
     "svelte-check": "^0.1.55",
     "svelte-forms": "^1.2.0",
     "svelte-loader": "^2.13.6",
-    "svelte-preprocess": "3.3.0"
+    "svelte-preprocess": "3.3.0",
+    "@tsconfig/svelte": "^1.0.2",
+    "tailwindcss": "^1.1.2",
+    "typescript": "^3.9.7"
   }
 }

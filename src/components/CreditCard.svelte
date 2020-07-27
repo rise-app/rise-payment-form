@@ -214,14 +214,6 @@
     GATEWAYS.stripe = stripeModule
     GATEWAYS.rave = raveModule
 
-    // import {
-    //   rise as riseGateway,
-    //   nexio as nexioGateway,
-    //   apple as appleGateway,
-    //   stripe as stripeGateway,
-    //   rave as raveGateway
-    // } from '../modules'
-
     selectedGateway = GATEWAYS[gateway_type]
     selectedGatewayConfig = GATEWAY_CONFIGS[gateway_type]
     document.getElementById('card_number').focus()
@@ -353,14 +345,14 @@
     notProcessing()
     submit_text = 'Retry'
     errors = transformErrors(err.errors)
-    dispatch('failed', errors)
+    return dispatch('failed', errors)
   }
 
   function success(res) {
-    dispatch('success', res.success)
+    return dispatch('success', res.success)
   }
   function token(res) {
-    dispatch('token', res.token)
+    return dispatch('token', res.token)
   }
 
   function complete(event) {
@@ -369,6 +361,7 @@
     btnDisabled = true
     token(event)
     success(event)
+    return
   }
 
 </script>

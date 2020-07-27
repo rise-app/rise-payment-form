@@ -1,14 +1,15 @@
-import { terser } from 'rollup-plugin-terser'
 import autoPreprocess from 'svelte-preprocess'
 import babel from 'rollup-plugin-babel'
 import commonjs from 'rollup-plugin-commonjs'
 import livereload from 'rollup-plugin-livereload'
+import { terser } from 'rollup-plugin-terser'
 import pkg from './package.json'
 import resolve from 'rollup-plugin-node-resolve'
 import svelte from 'rollup-plugin-svelte'
 import nodeResolve from 'rollup-plugin-node-resolve'
 import builtins from 'rollup-plugin-node-builtins'
 import globals from 'rollup-plugin-node-globals'
+import typescript from '@rollup/plugin-typescript'
 
 const production = !process.env.ROLLUP_WATCH;
 const name = pkg.name
@@ -17,7 +18,7 @@ const name = pkg.name
   .replace(/-\w/g, (m) => m[1].toUpperCase())
 
 export default {
-  input: !production ? 'src/main.js' : 'src/components/components.module.js',
+  input: !production ? 'src/main.ts' : 'src/components/components.module.ts',
   output: !production
     ? [
       // {
@@ -58,6 +59,7 @@ export default {
   plugins: [
     // json(),
     svelte({
+      // customElement: true,
       // enable run-time checks when not in production
       dev: !production,
       // we'll extract any component CSS out into
@@ -120,6 +122,10 @@ export default {
     // If we're building for production (npm run build
     // instead of npm run dev), minify
     production && terser(),
+
+    // Add typescript support
+    // https://svelte.dev/blog/svelte-and-typescript
+    typescript({ sourceMap: !production }),
   ],
   watch: {
     clearScreen: false,
