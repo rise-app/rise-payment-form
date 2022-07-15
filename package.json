@@ -92,7 +92,7 @@
     "sirv-cli": "0.4.5",
     "start-server-and-test": "1.10.7",
     "storybook-dark-mode": "0.6.1",
-    "svelte": "3.24.0",
+    "svelte": "3.49.0",
     "svelte-check": "^0.1.55",
     "svelte-forms": "^1.2.0",
     "svelte-loader": "^2.13.6",
